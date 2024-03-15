@@ -48,7 +48,7 @@ def get_repeatnum(modir):
     return num+1
 
 
-def contact_res(modir):
+def concat_res(modir):
     songlist = get_songlist(modir)
     print(songlist)
     print(len(songlist))
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args = OmegaConf.create(vars(args))
 
-    contact_res(args.modir)
+    concat_res(args.modir)
     
 
 
