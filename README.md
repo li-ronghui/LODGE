@@ -51,7 +51,7 @@ python infer_lodge.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets con
 ```
 
 
-## 🕺🕺🕺 Evaluate
+## 🔎🔎🔎 Evaluate
 Once the inference is done, run evaluate:
 
 ```bash
