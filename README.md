@@ -51,6 +51,14 @@ python infer_lodge.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets con
 ```
 
 
+## 🕺🕺🕺 Evaluate
+Once the inference is done, run evaluate:
+
+```bash
+python metric/metrics_finedance.py
+python metric/beat_align_score.py
+python metric/foot_skating.py
+```
 
 
 
