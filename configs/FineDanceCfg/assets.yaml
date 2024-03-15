@@ -1,0 +1,59 @@
+FOLDER: './experiments' # Experiment files saving path
+
+TEST:
+  FOLDER: './experiments' # Testing files saving path
+
+DATASET:
+  SMPL_PATH: '/data2/lrh/smpl_model/smpl'
+  SMPLH_PATH: '/data2/lrh/smpl_model/smplh'
+  SMPLX_PATH: '/data2/lrh/smpl_model/smplx'
+  TRANSFORM_PATH: './deps/transforms/'
+  WORD_VERTILIZER_PATH: './deps/t2m/glove/'
+  KIT:
+    ROOT: './datasets/kit-ml' # KIT directory
+    SPLIT_ROOT: './datasets/kit-ml' # KIT splits directory
+  HUMANML3D:
+    ROOT: '/home/data/lrh/project/motion/HumanML3D/HumanML3D' # HumanML3D directory
+    SPLIT_ROOT: '/home/data/lrh/project/motion/HumanML3D/HumanML3D' # HumanML3D splits directory
+  HUMANACT12:
+    ROOT: ./datasets/HumanAct12Poses
+    SPLIT_ROOT: ./datasets/HumanAct12Poses
+  UESTC:
+    ROOT: ./datasets/uestc
+    SPLIT_ROOT: ./datasets/uestc
+  AMASS:
+    DB_ROOT: /apdcephfs/share_1227775/shingxchen/uicap/data/vibe_db
+  FINEDANCE:
+    ROOT: /data/lrh/datasets/fine_dance/origin
+  FINEDANCE_263CUT:
+    ROOT: /data2/lrh/dataset/fine_dance/mofea263cut
+    MOTION: /data2/lrh/dataset/fine_dance/mofea263cut/new_joint_vecs
+    MUSIC: /data2/lrh/dataset/fine_dance/mofea263cut/musicfea_edge
+    normalizer:
+      target: dld.data.utils.preprocess.Normal
+      params:
+        mean: /data2/lrh/dataset/fine_dance/mofea263cut/normfile/Mean.npy  #/data2/lrh/dataset/fine_dance/mofea263cut/Mean.npy
+        std: /data2/lrh/dataset/fine_dance/mofea263cut/normfile/Std.npy
+  DOUBLEDANCE_263:
+    TXTINFO: /data2/lrh/dataset/fine_dance/total/mofea266/finedance_pair_exists.txt
+    ROOT: /data2/lrh/dataset/fine_dance/total/mofea266/mofea263
+    MOTION: /data2/lrh/dataset/fine_dance/total/mofea266/mofea263/new_joint_vecs
+    MUSIC: /data2/lrh/dataset/fine_dance/origin/music_feature35_edge
+    RELATIVE_DIS: /data2/lrh/dataset/fine_dance/total/mofea266/relative_dis.pkl
+    normalizer:
+      target: dld.data.utils.preprocess.Normal
+      params:
+        mean: /data2/lrh/dataset/fine_dance/total/mofea266/mofea263/Mean.npy
+        std: /data2/lrh/dataset/fine_dance/total/mofea266/mofea263/Std.npy
+  DOUBLEDANCE_266:
+    TXTINFO: /data2/lrh/dataset/fine_dance/total/mofea266/finedance_pair_exists.txt
+    ROOT: /data2/lrh/dataset/fine_dance/total/mofea266/
+    MOTION: /data2/lrh/dataset/fine_dance/total/mofea266/new_joint_vecs
+    MUSIC: /data2/lrh/dataset/fine_dance/origin/music_feature35_edge
+    RELATIVE_DIS: /data2/lrh/dataset/fine_dance/total/mofea266/relative_dis.pkl
+    normalizer:
+      target: dld.data.utils.preprocess.Normal
+      params:
+        mean: /data2/lrh/dataset/fine_dance/total/mofea266/Mean.npy
+        std: /data2/lrh/dataset/fine_dance/total/mofea266/Std.npy
+

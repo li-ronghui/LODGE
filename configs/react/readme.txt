@@ -1,0 +1,1 @@
+This folder is the setting of react dance, which means give the music and one dance motion as input, the algothrim output the another dancers motion.

@@ -1,0 +1,255 @@
+NAME: 0517_Norm_512len_315_transloss  # Experiment name
+ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
+DEVICE: [4] # Index of gpus eg. [0] or [0,1,2,3]
+
+# FOLDER: ./experiments
+SEED_VALUE: 1234
+Norm: False
+DEBUG: True
+TRAIN:
+  STAGE: vae    # diffusion
+  SPLIT: 'train'
+  NUM_WORKERS: 32 # Number of workers
+  BATCH_SIZE: 2048 # Size of batches
+  START_EPOCH: 0 # Start epoch
+  END_EPOCH: 2000 # End epoch
+  RESUME: '' # Experiment path to be resumed training
+  PRETRAINED_VAE: ''
+  PRETRAINED: '' # Pretrained model path
+  DATASETS: ['FineDance'] # Training datasets
+
+  OPTIM:
+    TYPE: 'AdamW' # Optimizer type
+    LR: 1e-4 # Learning rate
+
+  ABLATION:
+    VAE_TYPE: 'actor' # vae ablation: actor or mcross
+    VAE_ARCH: 'encoder_decoder' # mdiffusion vae architecture
+    PE_TYPE: 'actor' # mdiffusion mld or actor
+    DIFF_PE_TYPE: 'actor' # mdiffusion mld or actor
+    SKIP_CONNECT: False # skip connection for denoiser va
+    # use linear to expand mean and std rather expand token nums
+    MLP_DIST: False
+    IS_DIST: False # Mcross distribution kl
+    PREDICT_EPSILON: True # noise or motion
+
+EVAL:
+  SPLIT: 'gtest'
+  BATCH_SIZE: 1 # Evaluating Batch size
+  NUM_WORKERS: 12 # Evaluating Batch size
+
+TEST:
+  TEST_DIR: ''
+  CHECKPOINTS: 'experiments/DanceAE_module/AAA_0515_norm_dim2048_DanceAEmix_bs512_150to1200_win6_03_loss@fk_foot__2023-05-15-23-27-15/checkpoints/epoch=185.ckpt' #'./experiments/DanceAE_module/0512_DanceAEmix_bs64_hand_time_150to600_02/checkpoints/epoch=1327.ckpt' # Pretrained model path
+  SPLIT: 'gtest'
+  BATCH_SIZE: 1 # Testing Batch size
+  NUM_WORKERS: 12 # Evaluating Batch size
+  SAVE_PREDICTIONS: True # Weather to save predictions
+  COUNT_TIME: False # Weather to count time during test
+  REPLICATION_TIMES: 2 # Number of times to replicate the test
+  MM_NUM_SAMPLES: 100 # Number of samples for multimodal test
+  MM_NUM_REPEATS: 30 # Number of repeats for multimodal test
+  MM_NUM_TIMES: 10 # Number of times to repeat the multimodal test
+  DIVERSITY_TIMES: 300 # Number of times to repeat the diversity test
+  REP_I: 0
+  DATASETS: ['FineDance']
+
+model:
+  target: 'modules'
+  vae_type: 'DanceAE'
+  t2m_textencoder:
+    dim_word: 300
+    dim_pos_ohot: 15
+    dim_text_hidden: 512
+    dim_coemb_hidden: 512
+
+  t2m_motionencoder:
+    dim_move_hidden: 512
+    dim_move_latent: 512
+    dim_motion_hidden: 1024
+    dim_motion_latent: 512
+
+  m2d_motionencoder:
+    dim_move_hidden: 512
+    dim_move_latent: 512
+    dim_motion_hidden: 1024
+    dim_motion_latent: 512
+  
+  vae: true # whether vae model
+  model_type: DanceDiffuse_module # model type
+  condition: 'music'
+  latent_dim: [1, 256] # latent dimension
+  ff_size: 1024 #
+  num_layers: 9 # number of layers
+  num_head: 4 # number of head layers
+  droupout: 0.1 # dropout rate
+  activation: gelu # activation type
+  guidance_scale: 7.5 #
+  guidance_uncondp: 0.1 # 0.1 0.25
+
+  denoiser:
+    target: dld.models.architectures.dld_denoiser.DldDenoiser
+    params:
+      music_encoded_dim: 35
+      ff_size: 1024
+      num_layers: 9
+      num_heads: 4
+      dropout: 0.1
+      normalize_before: False
+      activation: 'gelu'
+      flip_sin_to_cos: True
+      return_intermediate_dec: False
+      position_embedding: 'learned'
+      arch: trans_enc
+      freq_shift: 0
+      condition: ${model.condition}
+      latent_dim: ${model.latent_dim}
+      guidance_scale: ${model.guidance_scale}
+      guidance_uncondp: ${model.guidance_uncondp}
+      nfeats: ${DATASET.NFEATS}
+      ablation: ${TRAIN.ABLATION}
+
+  normalizer:
+    target: dld.data.utils.preprocess.Normalizer
+    params:
+      data: /home/data/lrh/datasets/fine_dance/origin/normalizer_motion_feature315_0516.pth
+
+
+  motion_vae:
+    target: dld.models.architectures.autoencoder.DanceAE
+    params:
+      nfeats: ${DATASET.NFEATS}
+      scale: 4
+      MotionDecoder:
+        target: dld.models.architectures.autoencoder.MotionDecoderMix4
+        params:
+          nfeats: ${DATASET.NFEATS}
+          scale: ${model.motion_vae.params.scale}
+          dim: [1024, 768, 512, 315] #[2048, 1024, 512, 319] #   
+          
+      # arch: encoder_decoder
+      # ff_size: 1024
+      # num_layers: 9
+      # num_heads: 4
+      # dropout: 0.1
+      # normalize_before: false
+      # activation: gelu
+      # position_embedding: learned
+      # latent_dim: ${model.latent_dim}
+      # # nfeats: ${DATASET.NFEATS}
+      # ablation: ${TRAIN.ABLATION}
+      
+  
+  scheduler:
+    target: diffusers.DDIMScheduler
+    num_inference_timesteps: 50
+    eta: 0.0
+    params:
+      num_train_timesteps: 1000
+      beta_start: 0.00085
+      beta_end: 0.012
+      beta_schedule: 'scaled_linear' # Optional: ['linear', 'scaled_linear', 'squaredcos_cap_v2']
+      # variance_type: 'fixed_small'
+      clip_sample: false # clip sample to -1~1
+      # below are for ddim
+      set_alpha_to_one: false
+      steps_offset: 1
+
+  noise_scheduler:
+    target: diffusers.DDPMScheduler
+    params:
+      num_train_timesteps: 1000
+      beta_start: 0.00085
+      beta_end: 0.012
+      beta_schedule: 'scaled_linear' # Optional: ['linear', 'scaled_linear', 'squaredcos_cap_v2']
+      variance_type: 'fixed_small'
+      clip_sample: false # clip sample to -1~1
+      # below are for ddim
+      # set_alpha_to_one: false
+      # steps_offset: 1
+
+        
+
+LOSS:
+  TYPE: dld # Losses type
+  LAMBDA_LATENT: 1e-5 # Lambda for latent losses
+  LAMBDA_KL: 1e-5 # Lambda for kl losses
+  LAMBDA_REC: 1.0 # Lambda for reconstruction losses
+  LAMBDA_TRANS: 2.0
+  LAMBDA_JOINT: 2.0 # Lambda for joint losses
+  LAMBDA_GEN: 1.0 # Lambda for text-motion generation losses
+  LAMBDA_CROSS: 1.0 # Lambda for cross-reconstruction losses
+  LAMBDA_CYCLE: 1.0 # Lambda for cycle losses
+  LAMBDA_PRIOR: 0.0
+  LAMBDA_FOOT: 1.0
+  DIST_SYNC_ON_STEP: True # Sync Losses on step when distributed trained
+METRIC:
+  FORCE_IN_METER: True
+  DIST_SYNC_ON_STEP: True  # # Sync Losses on step when distributed trained
+  TYPE: ['DanceAE_Metric']  # DanceAE_Metric
+DATASET:
+  JOINT_TYPE: 'humanml3d' # join type # DEBUG
+  NCLASSES: 10
+  NFEATS: 135
+  SAMPLER:
+    MAX_SQE: -1
+    MAX_LEN: 196
+    MIN_LEN: 40
+    MAX_TEXT_LEN: 20
+  KIT:
+    PICK_ONE_TEXT: true
+    FRAME_RATE: 12.5
+    UNIT_LEN: 4
+  HUMANML3D:
+    PICK_ONE_TEXT: true
+    FRAME_RATE: 20.0
+    UNIT_LEN: 4
+  HUMANACT12:
+    NUM_FRAMES: 60
+    POSE_REP: rot6d
+    GLOB: true
+    TRANSLATION: true
+  UESTC:
+    NUM_FRAMES: 60
+    POSE_REP: rot6d
+    GLOB: true
+    TRANSLATION: true
+LOGGER:
+  SACE_CHECKPOINT_EPOCH: 5      # 保存间隔
+  LOG_EVERY_STEPS: 2
+  VAL_EVERY_STEPS: 2
+  TENSORBOARD: true
+  WANDB:
+    OFFLINE: false
+    PROJECT: null
+    RESUME_ID: null
+RENDER:
+  JOINT_TYPE: mmm
+  INPUT_MODE: npy
+  DIR: ''
+  NPY: ''
+  DENOISING: true
+  OLDRENDER: true
+  RES: high
+  DOWNSAMPLE: true
+  FPS: 12.5
+  CANONICALIZE: true
+  EXACT_FRAME: 0.5
+  NUM: 7
+  MODE: sequence
+  VID_EXT: mp4
+  ALWAYS_ON_FLOOR: false
+  GT: false
+DEMO:
+  MOTION_TRANSFER: false
+  RENDER: false
+  FRAME_RATE: 12.5
+  EXAMPLE: null
+
+FINEDANCE:
+  mix: False           # 是否做混合的数据增强
+  full_seq_len: 512   # 150
+  windows: 16  # 16   #40   #
+  is_mirror: False    # 是否做镜像的数据增强
+  nfeats: 315
+  njoints: 52   
