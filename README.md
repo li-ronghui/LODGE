@@ -88,4 +88,4 @@ If you think this project is helpful, please feel free to leave a star⭐️⭐�
 
 ## 👯👯👯 Acknowledgements
 
-This repository borrows heavily from [EDGE](https://github.com/Stanford-TML/EDGE) and [Bailando](https://github.com/lisiyao21/Bailando). thanks the authors for sharing their code and models.
+This repository borrows heavily from [EDGE](https://github.com/Stanford-TML/EDGE) and [Bailando](https://github.com/lisiyao21/Bailando). Thanks the authors for sharing their code and models.
