@@ -1,28 +1,25 @@
-NAME: AISTPP_Fine_Norm_128len_139 # Experiment name
+NAME: FineDance_relative_Norm_GenreDis_bc190 # Experiment name
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
-DEVICE: [4,5,6,7]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
+DEVICE: [0,1,2,3]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
 
 # FOLDER: ./experiments
 SEED_VALUE: 1234
 Norm: True
-Discriminator: true
+Discriminator: True
 DEBUG: False
-FineTune: True
+FineTune: false
 TRAIN:
   STAGE: diffusion    # diffusion
   SPLIT: 'train'
   NUM_WORKERS: 16 # Number of workers
-  BATCH_SIZE: 512 # Size of batches
+  BATCH_SIZE: 190 # Size of batches
   START_EPOCH: 1 # Start epoch
   END_EPOCH: 3001 # End epoch
   RESUME: '' # Experiment path to be resumed training
-  PRETRAINED_VAE: ''
+  # PRETRAINED_VAE: ''
   PRETRAINED: '' # Pretrained model path
-  DATASETS: ['AISTPP'] # Training datasets
+  DATASETS: ['FINEDANCE_139CUT'] # Training datasets
 
-  # OPTIM:
-  #   TYPE: 'AdamW' # Optimizer type
-  #   LR: 1e-4 # Learning rate
   OPTIM:
     TYPE: 'Adan' # Optimizer type
     LR: 4e-4 # Learning rate
@@ -40,15 +37,15 @@ TRAIN:
 
 EVAL:
   SPLIT: 'gtest'
-  BATCH_SIZE: 16 # Evaluating Batch size
+  BATCH_SIZE: 256 # Evaluating Batch size
   NUM_WORKERS: 16 # Evaluating Batch size
 
 TEST:
   TEST_DIR: ''
-  CHECKPOINTS: '' 
+  CHECKPOINTS: '' #/data2/lrh/project/dance/Lodge/lodge_pylight/experiments/Edge_Module/0115_newNorm_256len_263_diff_bc768/checkpoints/epoch=3899.ckpt 
   SPLIT: 'gtest'
-  BATCH_SIZE: 16 # Testing Batch size
-  NUM_WORKERS: 16 # Evaluating Batch size
+  BATCH_SIZE: 256 # Testing Batch size
+  NUM_WORKERS: 12 # Evaluating Batch size
   SAVE_PREDICTIONS: True # Weather to save predictions
   COUNT_TIME: False # Weather to count time during test
   REPLICATION_TIMES: 2 # Number of times to replicate the test
@@ -57,7 +54,7 @@ TEST:
   MM_NUM_TIMES: 10 # Number of times to repeat the multimodal test
   DIVERSITY_TIMES: 300 # Number of times to repeat the diversity test
   REP_I: 0
-  DATASETS: ['AISTPP']
+  DATASETS: ['FINEDANCE_139CUT']
 
 model:
   target: 'modules'
@@ -88,6 +85,7 @@ model:
       use_p2: False
       cond_drop_prob: 0.25
       guidance_weight: 2
+ 
   DanceDecoder:   
     target: dld.models.architectures.model.Refine_DanceDecoder
     params:
@@ -100,7 +98,8 @@ model:
       dropout: 0.1
       cond_feature_dim: 35
       activation: gelu
-  DanceDiscriminator:
+
+  DanceDiscriminator:   
     target: dld.models.architectures.model.DanceDiscriminator
     params:
       nfeats: ${FINEDANCE.nfeats}
@@ -112,22 +111,25 @@ model:
       dropout: 0.1
       cond_feature_dim: 35
       activation: gelu
+        
 LOSS:
-  TYPE: smpl_loss
-  LAMBDA_MSE: 0.636
-  LAMBDA_V: 2.964
-  LAMBDA_FK: 0.646
-  LAMBDA_FOOT: 10.942
+  TYPE: smpl_loss_relative # Losses type
+  LAMBDA_MSE: 0.636 
+  LAMBDA_V: 2.964 
+  LAMBDA_FK: 1 
+  LAMBDA_FOOT: 20 # Lambda for reconstruction losses
+  LAMBDA_FC: 0
+  LAMBDA_TRANS: 0
   LAMBDA_DIS: 0.1
-  DIST_SYNC_ON_STEP: true
+  DIST_SYNC_ON_STEP: True # Sync Losses on step when distributed trained
 METRIC:
   FORCE_IN_METER: True
   DIST_SYNC_ON_STEP: True  # # Sync Losses on step when distributed trained
   TYPE: ['DanceDiffuse_Metric']  # DanceAE_Metric
 LOGGER:
-  SACE_CHECKPOINT_EPOCH: 50      # 保存间隔
-  LOG_EVERY_STEPS: 50
-  VAL_EVERY_STEPS: 50
+  SACE_CHECKPOINT_EPOCH: 100      # 保存间隔
+  LOG_EVERY_STEPS: 100
+  VAL_EVERY_STEPS: 100
   TENSORBOARD: true
   WANDB:
     OFFLINE: false
@@ -151,19 +153,18 @@ RENDER:
   ALWAYS_ON_FLOOR: false
   GT: false
 DEMO:
-  MusicDir: ''
+  MusicDir: /data2/lrh/dataset/fine_dance/origin/music
   RENDER: false
   EXAMPLE: null
   use_cached_features: false
 
 FINEDANCE:
   mix: False           # 是否做混合的数据增强
-  full_seq_len: 128   # 150
-  windows: 3  # 16   #40   #
+  full_seq_len: 256   # 150
+  windows: 8  # 16   #40   #
   is_mirror: False    # 是否做镜像的数据增强
   nfeats: 139
   njoints: 22   
   mode: single  # "single" , "double_react", "double"
   partial: full   # "full" , "morden", "tradition"
-  GENRE_NUM: 10
-
+  GENRE_NUM: 16

@@ -1,9 +1,9 @@
-NAME: FineDance_FineTuneV3_relative_Norm_GenreDis_bc190_adv01 # Experiment name
+NAME: Debug_AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc # Experiment name
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
-DEVICE: [3,4,5,6,7]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
+DEVICE: [0,1,2,3]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
 
 # FOLDER: ./experiments
-SEED_VALUE: 1234
+SEED_VALUE: 1233
 Norm: True
 Discriminator: True
 DEBUG: False
@@ -14,9 +14,9 @@ TRAIN:
   NUM_WORKERS: 16 # Number of workers
   BATCH_SIZE: 190 # Size of batches
   START_EPOCH: 1 # Start epoch
-  END_EPOCH: 1001 # End epoch
+  END_EPOCH: 1601 # End epoch
   RESUME: '' # Experiment path to be resumed training
-  PRETRAINED: '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/FineDance_relative_Norm_GenreDis_bc190/checkpoints/epoch=1599.ckpt' # Pretrained model path
+  PRETRAINED: '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/FineDance_relative_Norm_GenreDis_bc190/checkpoints/epoch=1399.ckpt' # Pretrained model path
   DATASETS: ['FINEDANCE_139CUT'] # Training datasets
 
   OPTIM:
@@ -111,12 +111,14 @@ model:
         
 LOSS:
   TYPE: smpl_loss_relative # Losses type
-  LAMBDA_MSE: 10 
-  LAMBDA_V: 10
-  LAMBDA_FK: 16 
-  LAMBDA_FOOT: 50 # Lambda for reconstruction losses
-  LAMBDA_FC: 50
-  LAMBDA_TRANS: 10
+  LAMBDA_MSE: 0.636
+  LAMBDA_V: 2.964
+  LAMBDA_FK: 1
+  LAMBDA_FK_V: 0
+  LAMBDA_FK_A: 0
+  LAMBDA_FOOT: 10 # Lambda for reconstruction losses
+  LAMBDA_FC: 0
+  LAMBDA_TRANS: 0.5
   LAMBDA_DIS: 0.1
   DIST_SYNC_ON_STEP: True # Sync Losses on step when distributed trained
 METRIC:
@@ -124,9 +126,9 @@ METRIC:
   DIST_SYNC_ON_STEP: True  # # Sync Losses on step when distributed trained
   TYPE: ['DanceDiffuse_Metric']  # DanceAE_Metric
 LOGGER:
-  SACE_CHECKPOINT_EPOCH: 100      # 保存间隔
-  LOG_EVERY_STEPS: 100
-  VAL_EVERY_STEPS: 100
+  SACE_CHECKPOINT_EPOCH: 50      # 保存间隔
+  LOG_EVERY_STEPS: 50
+  VAL_EVERY_STEPS: 50
   TENSORBOARD: true
   WANDB:
     OFFLINE: false

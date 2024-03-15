@@ -1,0 +1,24 @@
+FOLDER: './experiments' # Experiment files saving path
+
+TEST:
+  FOLDER: './experiments' # Testing files saving path
+
+DATASET:
+  SMPL_PATH: '/data2/lrh/smpl_model/smpl'
+  SMPLH_PATH: '/data2/lrh/smpl_model/smplh'
+  SMPLX_PATH: '/data2/lrh/smpl_model/smplx'
+  AISTPP:
+    ROOT: /data2/lrh/dataset/aist/data/origin/30fps/fullset
+    MOTION: /data2/lrh/dataset/aist/data/origin/30fps/fullset/dances139_60fps
+    MUSIC: /data2/lrh/dataset/aist/data/origin/30fps/fullset/musics35_30fps
+    normalizer: /data2/lrh/project/dance/Lodge/lodge302/data/AIST_Normalizer.pth
+  AISTPP_60FPS:
+    MOTION: /data2/lrh/dataset/aist/data/origin/30fps/fullset/dances139_60fps
+    MUSIC: /data2/lrh/dataset/aist/data/origin/60fps/fullset/musics35_60fps
+  FINEDANCE_139CUT:
+    ROOT: /data2/lrh/dataset/fine_dance/gound
+    MOTION: /data2/lrh/dataset/fine_dance/gound/mofea319
+    MUSIC: /data2/lrh/dataset/fine_dance/gound/musicfea_edge
+    normalizer: /data2/lrh/project/dance/Lodge/lodge302/data/Normalizer.pth
+  
+
