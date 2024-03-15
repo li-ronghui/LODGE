@@ -45,8 +45,8 @@
 ## 🎤🎤🎤 Todo
 
 - [X] Release the code and config for teaser
-- [] Release the checkpoints
-- [] Release detailed guidance for traing and testing
+- [ ] Release the checkpoints
+- [ ] Release detailed guidance for traing and testing
 - [ ] Release more applications
 
 
