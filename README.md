@@ -10,29 +10,7 @@
 </div>
 
 
-<!-- <table class="center">
-  <td><img src="gif_results/new_result_0830/a_man_in_the_park.gif"></td>
-  <td><img src="gif_results/new_result_0830/a_Iron_man_in_the_street.gif"></td>
-  <tr>
-  <td width=25% style="text-align:center;">"The man is sitting on chair, on the park"</td>
-  <td width=25% style="text-align:center;">"The Iron man, on the street
-"</td>
-</tr>
-<td><img src="gif_results/new_result_0830/a_strom.gif"></td>
-<td><img src="gif_results/new_result_0830/a_astronaut_cartoon.gif"></td>
-<tr>
-<td width=25% style="text-align:center;">"The stormtrooper, in the gym
-"</td>
-<td width=25% style="text-align:center;">"The astronaut, earth background, Cartoon Style
-"</td>
-</tr>
-</table > -->
 
-<!-- ## 💃💃💃 Demo Video -->
-
-
-
-<!-- https://github.com/mayuelala/FollowYourPose/assets/38033523/e021bce6-b9bd-474d-a35a-7ddff4ab8e75 -->
 
 
 ## 💃💃💃 Abstract
@@ -57,7 +35,7 @@ Our method is trained using cuda11, pytorch-lightning 1.9.5 on Nvidia A100.
 ``` 
 conda env create -f lodge.yml
 ``` 
-Our environment is similar to EDGE ([official](https://edge-dance.github.io/). You may check them for more details.
+Our environment is similar to EDGE ([official])(https://edge-dance.github.io/). You may check them for more details.
 
 ## 💃💃💃 Training
 
