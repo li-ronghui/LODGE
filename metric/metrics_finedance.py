@@ -216,7 +216,7 @@ if __name__ == '__main__':
     # mod = '_global'
 
 
-    gt_root = '/data2/lrh/dataset/fine_dance/gound/mofea319'
+    gt_root = 'data/finedance/mofea319'
     pred_root = '/data2/lrh/project/dance/Lodge/lodge_pub/experiments/Local_Module/FineDance_FineTuneV2_Local/samples_dod_2999_299_inpaint_soft_ddim_notranscontrol_2024-03-16-04-29-01/concat/npy'
     print('Calculating and saving features')
 

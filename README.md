@@ -84,6 +84,8 @@ Set the pretrained Local Diffusion checkpoint path at the "TRAIN.PRETRAINED" of 
 python train.py --cfg configs/lodge/finedance_fea139_finetune_v2.yaml --cfg_assets configs/data/assets.yaml
 ```
 
+You can also download the pretrained model from [here](https://drive.google.com/file/d/13Yp__EPAw0EjrSS898X5FtSQGmveBykA/view?usp=sharing).
+
 ## 🕺🕺🕺 Inference
 Once the training is done, run inference:
 The --soft is a float parameter range from 0 to 1, which can set the number of steps for the soft cue guidance action. 
@@ -122,4 +124,4 @@ If you think this project is helpful, please leave a star⭐️⭐️⭐️ and 
 
 ## 👯👯👯 Acknowledgements
 
-This basic dance diffusion borrows from [EDGE](https://github.com/Stanford-TML/EDGE), the evaluate code borrows from  [Bailando](https://github.com/lisiyao21/Bailando). the README.md style borrows from [follow-your-pose](https://github.com/follow-your-pose/follow-your-pose.github.io). Thanks the authors for sharing their code and models.
+This basic dance diffusion borrows from [EDGE](https://github.com/Stanford-TML/EDGE), the evaluate code borrows from  [Bailando](https://github.com/lisiyao21/Bailando), the README.md style borrows from [follow-your-pose](https://github.com/follow-your-pose/follow-your-pose.github.io). Thanks the authors for sharing their code and models.

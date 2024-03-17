@@ -134,7 +134,7 @@ def calc_ba_score(motionroot, musicroot):
     return np.mean(ba_scores)
 
 if __name__ == '__main__':
-    music_root = "/data2/lrh/dataset/fine_dance/origin/music"
+    music_root = "data/finedance/music_wav"
     smplx_model = SMPLX_Skeleton()
     pred_root = '/data2/lrh/project/dance/Lodge/lodge_pub/experiments/Local_Module/FineDance_FineTuneV2_Local/samples_dod_2999_299_inpaint_soft_ddim_notranscontrol_2024-03-16-04-29-01/concat/npy'
 
