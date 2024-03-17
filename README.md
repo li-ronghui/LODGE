@@ -25,7 +25,7 @@
 ## 🎤🎤🎤 Todo
 
 - [X] Release the code and config for teaser
-- [ ] Release the checkpoints
+- [X] Release the checkpoints
 - [ ] Release detailed guidance for traing and testing
 - [ ] Release more applications
 
@@ -73,8 +73,15 @@ LODGE
 
 ## 💃💃💃 Training
 
+Traing the Local Diffusion and Global Diffusion
 ```bash
 python train.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets configs/data/assets.yaml 
+python train.py --cfg configs/lodge/coarse_finedance_fea139.yaml --cfg_assets configs/data/assets.yaml
+```
+
+Set the pretrained Local Diffusion checkpoint path at the "TRAIN.PRETRAINED" of "configs/lodge/finedance_fea139_finetune_v2.yaml", then finetuning the Local Diffusion for smooth generation.
+```bash
+python train.py --cfg configs/lodge/finedance_fea139_finetune_v2.yaml --cfg_assets configs/data/assets.yaml
 ```
 
 ## 🕺🕺🕺 Inference

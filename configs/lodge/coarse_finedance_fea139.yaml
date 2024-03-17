@@ -1,6 +1,6 @@
 NAME: FineDance_Coarse_relative_noNorm_128len_139_diff_bc800 # Experiment name
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
-DEVICE: [0,1]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
+DEVICE: [0,1] 
 
 # FOLDER: ./experiments
 SEED_VALUE: 1234
@@ -17,7 +17,7 @@ TRAIN:
   END_EPOCH: 3001 # End epoch
   RESUME: '' # Experiment path to be resumed training
   PRETRAINED_VAE: ''
-  PRETRAINED: '' # Pretrained model path
+  PRETRAINED: '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/FineDance_relative_Norm_GenreDis_bc190/checkpoints/epoch=1399.ckpt' # Attention! Set your Pretrained model path
   DATASETS: ['FINEDANCE_139CUT'] # Training datasets
 
   # OPTIM:

@@ -86,8 +86,8 @@ def music2genre(label_dir):
 
 class FineDance_Smpl(data.Dataset):
     def __init__(self, args, istrain, dataname=None):
-        self.motion_dir =  eval(f"args.DATASET.{dataname.upper()}.MOTION")     #'/data/lrh/datasets/fine_dance/origin/motion_feature319'
-        self.music_dir = eval(f"args.DATASET.{dataname.upper()}.MUSIC")        #'/data/lrh/datasets/fine_dance/origin/music_feature35'
+        self.motion_dir =  eval(f"args.DATASET.{dataname.upper()}.MOTION")     
+        self.music_dir = eval(f"args.DATASET.{dataname.upper()}.MUSIC")  
         if 'FINEDANCE' in dataname:
             self.music2genre = music2genre(eval(f"args.DATASET.{dataname.upper()}.LABEL"))
 
@@ -109,7 +109,7 @@ class FineDance_Smpl(data.Dataset):
         else:
             self.datalist = test_list
 
-        total_length = 0            # 将数据集中的所有motion用同一个index索引
+        total_length = 0            
 
         for name in tqdm(self.datalist):
             name = name + ".npy"
