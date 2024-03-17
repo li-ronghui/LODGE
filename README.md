@@ -35,7 +35,7 @@ Our method is trained using cuda11, pytorch-lightning 1.9.5 on Nvidia A100.
 ``` 
 conda env create -f lodge.yml
 ``` 
-Our environment is similar to EDGE ([official])(https://edge-dance.github.io/). You may check them for more details.
+Our environment is similar to EDGE [official](https://edge-dance.github.io/). You may check them for more details.
 
 ## 🔢🔢🔢 Data preparation
 
