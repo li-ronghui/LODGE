@@ -124,4 +124,4 @@ If you think this project is helpful, please leave a star⭐️⭐️⭐️ and 
 
 ## 👯👯👯 Acknowledgements
 
-This basic dance diffusion borrows from [EDGE](https://github.com/Stanford-TML/EDGE), the evaluate code borrows from  [Bailando](https://github.com/lisiyao21/Bailando), the README.md style borrows from [follow-your-pose](https://github.com/follow-your-pose/follow-your-pose.github.io). Thanks the authors for sharing their code and models.
+This basic dance diffusion borrows from [EDGE](https://github.com/Stanford-TML/EDGE), the evaluate code borrows from  [Bailando](https://github.com/lisiyao21/Bailando), the README.md style borrows from [follow-your-pose](https://github.com/mayuelala/FollowYourPose). Thanks the authors for sharing their code and models.
