@@ -80,13 +80,13 @@ class MovieMaker():
 
 
         self.smplh = SMPLH(SMPLH_path, use_pca=False, flat_hand_mean=True)
-        self.smplh.to(f'cuda:{args.gpu}').eval()
+        self.smplh.to(f'cuda:{args.device}').eval()
         
         self.smpl = SMPL(SMPL_path)
-        self.smpl.to(f'cuda:{args.gpu}').eval()
+        self.smpl.to(f'cuda:{args.device}').eval()
 
         self.smplx = SMPLX(SMPLX_path, use_pca=False, flat_hand_mean=True).eval()
-        self.smplx.to(f'cuda:{args.gpu}').eval()
+        self.smplx.to(f'cuda:{args.device}').eval()
 
         self.scene = pyrender.Scene()
         camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
@@ -179,10 +179,12 @@ class MovieMaker():
             output_file = os.path.join(self.save_path, tab + '-' + str(i) + '-music.mp4')
             self.save_video(movie_file, color_list)
             if music_file is not None:
-                subprocess.run(['/home/lrh/Documents/ffmpeg-6.0-amd64-static/ffmpeg','-i',movie_file,'-i',music_file,'-shortest',output_file])
+                # subprocess.run(['/home/lrh/Documents/ffmpeg-6.0-amd64-static/ffmpeg','-i',movie_file,'-i',music_file,'-shortest',output_file])
+                subprocess.run(['ffmpeg','-i',movie_file,'-i',music_file,'-shortest',output_file])
             else:
-                subprocess.run(['/home/lrh/Documents/ffmpeg-6.0-amd64-static/ffmpeg','-i',movie_file,output_file])
-            os.remove(movie_file)
+                # subprocess.run(['/home/lrh/Documents/ffmpeg-6.0-amd64-static/ffmpeg','-i',movie_file,output_file])
+                subprocess.run(['ffmpeg','-i',movie_file,output_file])
+                os.remove(movie_file)
 
             
             
@@ -218,7 +220,7 @@ class MovieMaker():
     
     def run(self, seq_rot, music_file=None, tab='', save_pt=False):
         if isinstance(seq_rot, np.ndarray):
-            seq_rot = torch.tensor(seq_rot, dtype=torch.float32, device=f'cuda:{args.gpu}')
+            seq_rot = torch.tensor(seq_rot, dtype=torch.float32, device=f'cuda:{args.device}')
 
         if save_pt:
             torch.save(seq_rot.detach().cpu(), os.path.join(self.save_path, tab +'_pose.pt'))
@@ -319,7 +321,6 @@ def motion_data_load_process(motionfile):
             modata = np.concatenate((modata, hand_zeros), axis=1)
         assert modata.shape[1] == 159
         modata[:, 1] = modata[:, 1] + 0 # + 1.25
-        # modata = torch.from_numpy(modata).to(f'cuda:{args.gpu}')
         return modata
     elif motionfile.split(".")[-1] == "npy":
         modata = np.load(motionfile)
@@ -335,20 +336,6 @@ def motion_data_load_process(motionfile):
             modata = np.concatenate((modata[:,:3], axis), axis=1)
             print("modata.shape is:", modata.shape)
         elif modata.shape[-1] == 319:
-            # print("set_on_ground_139")
-            # smplxmodel = SMPLX_Skeleton()
-            # modata = torch.from_numpy(modata)[:, :139]
-            # modata = set_on_ground_139(modata, smplxmodel).detach().cpu().numpy()
-            # print("modata.shape is:", modata.shape)
-            # modata = modata[:,4:]
-            # rot6d = torch.from_numpy(modata[:,3:])
-            # T,C = rot6d.shape
-            # rot6d = rot6d.reshape(-1,6)
-            # axis = ax_from_6v(rot6d).view(T,-1).detach().cpu().numpy()
-            # hand_zeros = torch.zeros([T, 90]).to(rot6d).detach().cpu().numpy()
-            # modata = np.concatenate((modata[:,:3], axis, hand_zeros), axis=1)
-            # print("modata.shape is:", modata.shape)
-   
             print("modata.shape is:", modata.shape)
             modata = modata[:,4:]
             rot6d = torch.from_numpy(modata[:,3:])
@@ -359,11 +346,6 @@ def motion_data_load_process(motionfile):
             # print("modata.shape is:", modata.shape)
         elif modata.shape[-1] == 159:
             print("modata.shape is:", modata.shape)
-            # rot6d = torch.from_numpy(modata[:,3:])
-            # T,C = rot6d.shape
-            # rot6d = rot6d.reshape(-1,6)
-            # axis = ax_from_6v(rot6d).view(T,-1).detach().cpu().numpy()
-            # modata = np.concatenate((modata[:,:3], axis), axis=1)
             print("modata.shape is:", modata.shape)
         elif modata.shape[-1] == 135:
             print("modata.shape is:", modata.shape)
@@ -379,39 +361,12 @@ def motion_data_load_process(motionfile):
         elif modata.shape[-1] == 139:
             print("modata.shape is:", modata.shape)
             modata = modata[:,4:]
-
             rot6d = torch.from_numpy(modata[:,3:])
             T,C = rot6d.shape
             rot6d = rot6d.reshape(-1,6)
             axis = ax_from_6v(rot6d).view(T,-1).detach().cpu().numpy()
             hand_zeros = torch.zeros([T, 90]).to(rot6d).detach().cpu().numpy()
             modata = np.concatenate((modata[:,:3], axis, hand_zeros), axis=1)
-            print("modata.shape is:", modata.shape)
-        elif modata.shape[-1] == 268 or modata.shape[-1] == 271:
-            print("modata.shape is:", modata.shape)
-            T, _ = modata.shape
-            modata = torch.from_numpy(modata).float()
-            r_pos = torch.zeros([T, 3])   #.to(modata.device)
-            r_pos[1:, [0, 2]] = modata[:-1, [0, 2]]
-            r_pos = torch.cumsum(r_pos, dim=-2)
-            r_pos[..., 1] = modata[..., 1]
-            
-            rot6d = modata[:,3:3+22*6].reshape(-1,6)
-            axis = ax_from_6v(rot6d).view(T,-1).detach().cpu().numpy()
-            hand_zeros = torch.zeros([T, 90]).to(rot6d).detach().cpu().numpy()
-            modata = np.concatenate((r_pos, axis, hand_zeros), axis=1)
-            print("modata.shape is:", modata.shape)
-        elif modata.shape[-1] == 144:
-            print("attention! there are two cases of 144!!!")
-            print("modata.shape is:", modata.shape)
-            T, _ = modata.shape
-            modata = torch.from_numpy(modata).float()
-            r_pos = modata[:,:3]   #.to(modata.device)
-            rot6d = modata[:,6:6+22*6].reshape(-1,6)
-            axis = ax_from_6v(rot6d).view(T,22*3).detach().cpu().numpy()
-
-            hand_zeros = torch.zeros([T, 90]).to(rot6d).detach().cpu().numpy()
-            modata = np.concatenate((r_pos, axis, hand_zeros), axis=1)
             print("modata.shape is:", modata.shape)
         else:
             raise("shape error!")
@@ -421,27 +376,16 @@ def motion_data_load_process(motionfile):
                 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--gpu", type=str, default="3")
+    parser.add_argument("--device", type=str, default="0")
     parser.add_argument("--modir", type=str, default="")
     parser.add_argument("--mode", type=str, default="smplx", choices=['smpl','smplh','smplx'])
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--save_path", type=str, default=None)
     parser.add_argument("--song", type=str, default=None)
     args = parser.parse_args()
-    print(args.gpu)
+    print(args.device)
 
 
-    # motion_file = "magic_renders/train_mg_exp/1995_1_130_slice0.pkl"
-    # music_dir = "/home/data/lrh/datasets/fine_dance/magicsmpl/sliced/test/wavs"
-    # music_name = os.path.basename(motion_file).split(".")[0].split("_")[2] + "_" + os.path.basename(motion_file).split(".")[0].split("_")[-1]
-    # music_file = os.path.join(music_dir, music_name + ".wav")
-    # if not os.path.isfile(music_file):
-    #     music_file = os.path.join(music_dir.replace("test", "train"), music_name + ".wav")
-    # visualizer = MovieMaker(save_path='magic_renders/train_mg_exp/A_out/')
-    # modata = motion_data_load_process(motion_file)
-    # visualizer.run(modata, tab=os.path.basename(motion_file).split(".")[0], music_file=music_file)
-    
-    # motion_dir = "/home/data/lrh/project/motion/dance-latent-diffusion/dance_results/DanceAE_module/0516morning_no_norm_dim1024_DanceAEmix_bs512_150to1200_win6_03_loss@fk_foot_ckpt965/test/samples_2023-05-17-09-33-52"
     motion_dir = args.modir
     if args.save_path is not None:
         save_path = args.save_path
@@ -467,28 +411,10 @@ if __name__ == '__main__':
             if flag:
                 print("exist", file)
                 continue
-        # if file[0] in ['M', "d"]:
-            # if file[:-4] in ["063", "132", "143", "036", "098", "198", "130", "012", "211", "193", "179", "065", "137", "161", "092", "120", "037", "109", "204", "144"]:    #, "095", "008", "069", "981"]:
-        # if '036' in file and 'gpt' not in file:
-            # if 'dod' in file:
-            # if int(file.split('_')[0]) < 380:  
-            #     continue
-                    # if args.song in file:
-                        # if int(file.split("_")[0]) > 550:
-                        # if 'M' in file:
+
             print(file)
             motion_file = os.path.join(motion_dir, file)
-            # music_name = os.path.basename(motion_file).split(".")[0].split("_")[2] + "_" + os.path.basename(motion_file).split("."[0]split("_")[-1]
-            # music_file = os.path.join(music_dir, music_name + ".wav")
-            # if not os.path.isfile(music_file):
-            #     music_file = os.path.join(music_dir.replace("test", "train"), music_name + ".wav")
             visualizer = MovieMaker(save_path=save_path)
             modata = motion_data_load_process(motion_file)
             visualizer.run(modata, tab=os.path.basename(motion_file).split(".")[0], music_file=None)
     print('done')
-
-# xvfb-run -s "-screen 0 640x480x24" python render_smpl.py
-
-'''
-./configure --prefix=/home/lrh/Documents/render/prefix   --enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau  --enable-shared-glapi    --disable-texture-float  --enable-gallium-llvm --enable-llvm-shared-libs   --with-gallium-drivers=swrast,swr   --disable-dri --with-dri-drivers=  --disable-egl --with-egl-platforms= --disable-gbm --disable-glx   --disable-osmesa --enable-gallium-osmesa  ac_cv_path_LLVM_CONFIG=llvm-config-6.0
-'''

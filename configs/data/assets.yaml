@@ -16,9 +16,11 @@ DATASET:
     MOTION: /data2/lrh/dataset/aist/data/origin/30fps/fullset/dances139_60fps
     MUSIC: /data2/lrh/dataset/aist/data/origin/60fps/fullset/musics35_60fps
   FINEDANCE_139CUT:
-    ROOT: /data2/lrh/dataset/fine_dance/gound
-    MOTION: /data2/lrh/dataset/fine_dance/gound/mofea319
-    MUSIC: /data2/lrh/dataset/fine_dance/gound/musicfea_edge
-    normalizer: /data2/lrh/project/dance/Lodge/lodge302/data/Normalizer.pth
+    ROOT: data/finedance
+    MOTION: data/finedance/mofea319
+    MUSIC: data/finedance/music_npynew
+    normalizer: data/Normalizer.pth
+    # LABEL: data/finedance/label_json/
+    LABEL: /data2/lrh/dataset/fine_dance/origin/label_json/
   
 

@@ -26,44 +26,6 @@ def increment_path(path, exist_ok=False, sep="", mkdir=False):
         dir.mkdir(parents=True, exist_ok=True)  # make directory
     return path
 
-'''
-class Normalizer:
-    def __init__(self, data):
-        if isinstance(data, str):
-            self.scaler = MinMaxScaler((-1, 1), clip=True)
-            with open(data, 'rb') as f:
-                normalizer_state_dict = pickle.load(f)
-            # normalizer_state_dict = torch.load(data)
-            self.scaler.scale_ = normalizer_state_dict["scale"]
-            self.scaler.min_ = normalizer_state_dict["min"]
-        else:
-            flat = data.reshape(-1, data.shape[-1])     # bxt , 151
-            self.scaler = MinMaxScaler((-1, 1), clip=True)
-            self.scaler.fit(flat)
-
-    def normalize(self, x):
-        if len(x.shape) == 3:
-            batch, seq, ch = x.shape
-            x = x.reshape(-1, ch)
-            return self.scaler.transform(x).reshape((batch, seq, ch))
-        elif len(x.shape) == 2:
-            batch, ch = x.shape
-            return self.scaler.transform(x)
-        else:
-            raise("input error!")
-
-    def unnormalize(self, x):
-        if len(x.shape) == 3:
-            batch, seq, ch = x.shape
-            x = x.reshape(-1, ch)
-            x = torch.clip(x, -1, 1)  # clip to force compatibility
-            return self.scaler.inverse_transform(x).reshape((batch, seq, ch))
-        elif len(x.shape) == 2:
-             x = torch.clip(x, -1, 1)
-             return self.scaler.inverse_transform(x)
-        else:
-            raise("input error!")
-'''
 
 
 def quat_to_6v(q):

@@ -67,6 +67,13 @@ def parse_args(phase="train"):
                            type=str,
                            required=False,
                            help="evaluate existing npys")
+        group.add_argument(
+            "--soft",
+            type=float,
+            required=False,
+            default=0.0,
+            help="the weight of soft guidance, bewteen 0-1",
+        )
 
     if phase == "demo":
         # group.add_argument("--motion_transfer", action='store_true', help="Motion Distribution Transfer")
@@ -201,6 +208,7 @@ def parse_args(phase="train"):
     if cfg.DEBUG:
         cfg.NAME = "debug--" + cfg.NAME
         cfg.LOGGER.WANDB.OFFLINE = True
-        # cfg.LOGGER.VAL_EVERY_STEPS = 1
+
+    cfg.soft = params.soft
 
     return cfg

@@ -109,10 +109,8 @@ def calc_fid(kps_gen, kps_gt):
 
     mu_gen = np.mean(kps_gen, axis=0)
     sigma_gen = np.cov(kps_gen, rowvar=False)
-
     mu_gt = np.mean(kps_gt, axis=0)
     sigma_gt = np.cov(kps_gt, rowvar=False)
-
     mu1,mu2,sigma1,sigma2 = mu_gen, mu_gt, sigma_gen, sigma_gt
 
     diff = mu1 - mu2
@@ -164,27 +162,14 @@ def calc_and_save_feats(root):
     if not os.path.exists(os.path.join(root, 'manual_features_new')):
         os.mkdir(os.path.join(root, 'manual_features_new'))
     
-    # gt_list = []
-    pred_list = []
-    test_list = ["063", "132", "143", "036", "098", "198", "130", "012", "211", "193", "179", "065", "137", "161", "092",  "037", "109", "204", "144"]
-    for pkl in tqdm(os.listdir(root)):
-        if os.path.isdir(os.path.join(root, pkl)):
+    for file in tqdm(os.listdir(root)):
+        if os.path.isdir(os.path.join(root, file)):
             continue
-        if pkl[-3:] == 'pkl':
-            data = pickle.load(open(os.path.join(root, pkl), "rb"))
-            print(data.keys())
-            model_q = torch.from_numpy(data['smpl_poses'] ).to(device)   
-            model_x = torch.from_numpy(data['smpl_trans'] ).to(device)    
-            print("model_q", model_q.shape)
-            print("model_x", model_x.shape)
-            model_q156 = torch.cat([model_q, torch.zeros([model_q.shape[0], 90]).to(device) ], dim=-1)
-            with torch.no_grad():
-                joint3d = smplx_model.forward(model_q156, model_x)[:,:24,:]
-                print("joint3d", joint3d.shape)
-        elif pkl[-3:] == 'npy':
-            if pkl[0] == 'M':
+      
+        if file[-3:] == 'npy':
+            if file[0] == 'M':
                 continue
-            data = np.load(os.path.join(root, pkl))
+            data = np.load(os.path.join(root, file))
             assert len(data.shape) == 2
             if data.shape[1] == 139 or data.shape[1] == 319:
                 data = data[:1024,:139]
@@ -193,33 +178,30 @@ def calc_and_save_feats(root):
                 data = data[:1024,:135]
                 data = torch.from_numpy(data).to(device)   
                 data = torch.cat([torch.zeros([data.shape[0], 4]).to(data),  data], dim=1) 
-            # print(data.shape)
             assert data.shape[-1] == 139
             
             with torch.no_grad():
                 joint3d = do_smplxfk(data, smplx_model)[:,:24,:]
         else:
             continue
-        print(pkl)
-        joint3d = joint3d[:1024,:22,:]      # Attention
+        print(file)
+        joint3d = joint3d[:1024,:22,:]
         assert len(joint3d.shape) == 3
         joint3d = joint3d.reshape(joint3d.shape[0], 22*3).detach().cpu().numpy()
             
         
-        # print(extract_manual_features(joint3d.reshape(-1, 24, 3)))
         roott = joint3d[:1, :3]  # the root Tx72 (Tx(24x3))
-        # print(roott)
         joint3d = joint3d - np.tile(roott, (1, 22))  # Calculate relative offset with respect to root
 
         # relative
         joint3d_relative = joint3d.copy()
         joint3d_relative = joint3d_relative.reshape(-1, 22, 3)
         joint3d_relative[:, 1:, :] = joint3d_relative[:, 1:, :] - joint3d_relative[:, 0:1, :]
-        np.save(os.path.join(root, 'kinetic_features', pkl), extract_kinetic_features(joint3d_relative.reshape(-1, 22, 3)))
-        np.save(os.path.join(root, 'manual_features_new', pkl), extract_manual_features(joint3d_relative.reshape(-1, 22, 3)))
+        np.save(os.path.join(root, 'kinetic_features', file), extract_kinetic_features(joint3d_relative.reshape(-1, 22, 3)))
+        np.save(os.path.join(root, 'manual_features_new', file), extract_manual_features(joint3d_relative.reshape(-1, 22, 3)))
 
-        # np.save(os.path.join(root, 'kinetic_features', pkl), extract_kinetic_features(joint3d.reshape(-1, 22, 3)))
-        # np.save(os.path.join(root, 'manual_features_new', pkl), extract_manual_features(joint3d.reshape(-1, 22, 3)))
+        # np.save(os.path.join(root, 'kinetic_features', file), extract_kinetic_features(joint3d.reshape(-1, 22, 3)))
+        # np.save(os.path.join(root, 'manual_features_new', file), extract_manual_features(joint3d.reshape(-1, 22, 3)))
 
 
 if __name__ == '__main__':
@@ -230,30 +212,20 @@ if __name__ == '__main__':
     opt = parser.parse_args()
     device = f"cuda:1"
     smplx_model = SMPLX_Skeleton(Jpath='data/smplx_neu_J_1.npy')
-    mod = '_relative'
-    mod = '_global'
+    # mod = '_relative'
+    # mod = '_global'
 
-    # gt_root = '/data2/lrh/dataset/fine_dance/gound/div_by_time/mofea319_256/'
-    # gt_root = '/data2/lrh/dataset/fine_dance/gound/mofea319/'
-    # gt_root = '/data2/lrh/dataset/fine_dance/div_by_time/motion_fea319_256/'
-    # gt_root = '/data2/lrh/dataset/fine_dance/div_by_time/motion_fea319_1024/'
-    # gt_root = '/data2/lrh/dataset/fine_dance/gound/div_by_time/mofea319_1024/'
-    # gt_root = '/data2/lrh/dataset/fine_dance/gound/div_by_time/mofea319_1800/'
-    # gt_root = 'experiments/compare/gt_finedance/gound_1024_test_relative'
 
     gt_root = '/data2/lrh/dataset/fine_dance/gound/mofea319'
-    pred_root = '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/FineDance_relative_Norm_GenreDis_bc190/samples_dod_inpaint_soft_2024-03-08-02-47-19/concat/npy'
+    pred_root = '/data2/lrh/project/dance/Lodge/lodge_pub/experiments/Local_Module/FineDance_FineTuneV2_Local/samples_dod_2999_299_inpaint_soft_ddim_notranscontrol_2024-03-16-04-29-01/concat/npy'
     print('Calculating and saving features')
-
-
 
 
     if opt.modir != 'None':
         pred_root = opt.modir
     # calc_and_save_feats(gt_root)
-    # calc_and_save_feats(pred_root)
+    calc_and_save_feats(pred_root)
     
-
     print('Calculating metrics')
     print("gt_root", gt_root)
     print("pred_root", pred_root)

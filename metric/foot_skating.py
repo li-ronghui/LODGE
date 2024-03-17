@@ -94,77 +94,11 @@ def calc_foot_skating_ratio(data):
 
     return left_ratio, right_ratio
 
-# def calc_foot_skating_ratio(data):
-#     assert len(data.shape) == 2
-#     smplx = SMPLX_Skeleton()
-#     if data.shape[1] == 139 or data.shape[1] == 319:
-#         data = torch.from_numpy(data[:,:139])
-#     elif data.shape[1] == 135 or data.shape[1] == 315:
-#         data = torch.from_numpy(data[:,:135])
-#         data = torch.cat([torch.zeros([data.shape[0], 4]).to(data), data], dim=-1)
-#         assert data.shape[1] == 139
-#     else:
-#         print(data.shape)
-#         raise("input data shape error!")
-#     data = set_on_ground_139(data, smplx, -1.2)
-#     with torch.no_grad():
-#         model_xp = do_smplxfk(data, smplx)
-
-#     # 地面loss 地面-1.2
-#     l_ankle_idx, r_ankle_idx, l_foot_idx, r_foot_idx = 7, 8, 10, 11
-#     relevant_joints = [l_ankle_idx, r_ankle_idx, l_foot_idx, r_foot_idx]
-#     pred_joint_xyz = model_xp[:, relevant_joints, :] 
-#     pred_vel = torch.zeros_like(pred_joint_xyz)
-#     pred_vel[:-1] = (
-#         pred_joint_xyz[1:, :, :] - pred_joint_xyz[:-1, :, :]
-#     )  # (S-1, 4, 3)
-#     foot_y_ankle = pred_joint_xyz[ :, :2, 1]
-#     foot_y_toe = pred_joint_xyz[:, 2:, 1]
-#     print("pred_vel.shape", pred_vel.shape)
-#     velocity_foot_normal = torch.linalg.norm(pred_vel[:, :, 1:2], axis=2)  # [B,t,4] 
-#     velocity_foot_tangent = torch.cat([pred_vel[:, :, 0:1], pred_vel[:, :, 2:3] ], dim=2)
-#     # fc_mask_v = torch.unsqueeze((velocity_foot_normal <= 0.01), dim=2).repeat(1, 1, 1, 3)
-#     # fc_mask_ankle = torch.unsqueeze((foot_y_ankle <= (-1.2+0.05)), dim=2).repeat(1, 1, 1, 3)
-#     # fc_mask_teo = torch.unsqueeze((foot_y_toe <= (-1.2+0.05)), dim=2).repeat(1, 1, 1, 3)
-#     fc_mask_ankle = (foot_y_ankle <= (-1.2+0.05))
-#     fc_mask_teo = (foot_y_toe <= (-1.2+0.05))
-#     fc_mask_y = torch.cat([fc_mask_ankle, fc_mask_teo], dim=1).squeeze(0)
-#     # pred_vel[~fc_mask_v] = 0
-#     print("fc_mask_y", fc_mask_y.shape)
-#     pred_vel[~fc_mask_y] = 0
-#     static_num = torch.sum(torch.any(fc_mask_y.view(fc_mask_y.shape[0], 4), dim=-1))
-#     print("static_num", static_num)
-#     velocity_foot_tangent = torch.cat([pred_vel[:, :, 0:1], pred_vel[:, :, 2:3] ], dim=2)
-#     velocity_foot_tangent = torch.abs(torch.mean(velocity_foot_tangent, dim=-1))        # T, 4
-#     print("velocity_foot_tangent.shape", velocity_foot_tangent.shape)
-#     velocity_foot_tangent = velocity_foot_tangent > 0.025
-#     slide_frames = torch.any(velocity_foot_tangent, dim=-1)
-#     slide_num = torch.sum(slide_frames)
-#     ratio = slide_num / data.shape[0]
-#     ratio = ratio.item()
-#     print("ratio", ratio)
-#     static_ratio = (slide_num / static_num).item()
-#     print("static_ratio", static_ratio)
-
-#     return ratio, static_ratio
 
 
 
 if __name__ == '__main__':
-    test_dir = '/data2/lrh/dataset/fine_dance/gound/mofea319/testset'
-    # test_dir = '/data2/lrh/project/dance/long/experiments/compare/fact/data1min'
-    # test_dir = '/data2/lrh/project/dance/long/experiments/compare/mnet/data1min'
-    # test_dir = '/data2/lrh/dataset/fine_dance/origin/motion_feature319/testset'
-    # test_dir = 'experiments/compare/edge/edge_5_long/2175/npy'
-    # test_dir = 'experiments/compare/gpt/experiments/infer/clip8_139/FineDance_1007_1024_win128/1107/res1_hint0'
-    # test_dir = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint0/concat/npy'
-    # test_dir = 'experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint200/concat/npy'
-
-    # test_dir = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/ddim_10/concat/npy'
-    # test_dir = '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_549_inpaint_soft_notranscontrol_2024-03-11-21-05-44/concat/npy'
-    # test_dir  = '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_299_inpaint_soft_notranscontrol_2024-03-11-21-05-27/concat/npy'
-    # test_dir = 'experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc/samples_dod2999_199_inpaint_soft_notranscontrol_2024-03-12-04-53-44/concat/npy'
-    test_dir = 'dance_results/Local_Module/AFineDance_NoFootBlock_V2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_1499_inpaint_soft_notranscontrol_2024-03-14-05-01-56/concat/npy'
+    test_dir = '/data2/lrh/project/dance/Lodge/lodge_pub/experiments/Local_Module/FineDance_FineTuneV2_Local/samples_dod_2999_299_inpaint_soft_ddim_notranscontrol_2024-03-16-04-29-01/concat/npy'
 
     ground_height = 0
     left_ratio_list = []

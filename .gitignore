@@ -5,11 +5,11 @@ __pycache__/
 
 # my
 experiments
-mofea263code
 generated
 temp
-wandb
+exp
 dance_results
+data/finedance
 
 # C extensions
 *.so

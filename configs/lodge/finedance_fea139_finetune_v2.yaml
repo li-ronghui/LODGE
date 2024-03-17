@@ -1,4 +1,4 @@
-NAME: Debug_AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc # Experiment name
+NAME: Debug_FineDance_FineTuneV2_Local # Experiment name
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
 DEVICE: [0,1,2,3]   #,  #  # Index of gpus eg. [0] or [0,1,2,3]
 

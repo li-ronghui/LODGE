@@ -709,24 +709,31 @@ class SMPLX_Skeleton:
         Arguments (where N = batch size, L = sequence length, J = number of joints):
          -- rotations: (N, 156)  或 (N, 165)
          -- root_positions: (N, 3) 
-         输出: N, 55, 3 关节点全局坐标
+         Output: N, 55, 3 Global coordinates of the joints
         """
-        # assert len(rotations.shape) == 4
-        # assert len(root_positions.shape) == 3
-        # print(fk_device)
+
+        if len(root_positions.shape) == 3:
+            b, s, c = root_positions.shape
+            root_positions = root_positions.view(b*s, -1)
+        if len(rotations.shape) == 4:               # (B, S, 55, 3)  或 (B, S, 52, 3)
+            b, s, c, _ = rotations.shape
+            rotations = rotations.view(b*s, -1)     # (B, S, 55*3)  (B, S, 52*3)
+        elif len(rotations.shape) == 3:
+            b, s, _ = rotations.shape
+            rotations = rotations.view(b*s, -1)
+        assert len(rotations.shape) == 2
+        assert len(root_positions.shape) == 2
+        
         fk_device = rotations.device
         if rotations.shape[1] == 156:
             local_q_165 = torch.cat([rotations[:, :66], torch.zeros([rotations.shape[0], 9], device=fk_device, dtype=torch.float32), rotations[:, 66:]], dim=1).to(fk_device).float()
         elif rotations.shape[1] == 165:
             local_q_165 = rotations.to(fk_device).float()
-        else:
-            print("rotations shape error", rotations.shape)
-            sys.exit(0)
+        elif rotations.shape[1] == 66:
+            local_q_165 = torch.cat([rotations[:, :66], torch.zeros([rotations.shape[0], 99], device=fk_device, dtype=torch.float32)], dim=1).to(fk_device).float()
         
         root_pos = root_positions.to(fk_device).float()
         assert local_q_165.shape[1] == 165
-        
-        
         B, C = local_q_165.shape
         # print("local_q shape is:", local_q_165.shape)
         rot_mats = self.batch_rodrigues(local_q_165.view(-1, 3)).view(

@@ -15,7 +15,6 @@ import numpy as np
 import torch, glob, random
 import torch.backends.cudnn as cudnn
 from torch.utils.data import ConcatDataset, DataLoader
-# from torchsummary        ort summary
 from tqdm import tqdm
        
 from dld.config import parse_args
@@ -24,7 +23,7 @@ from dld.data.get_data import get_datasets
 from dld.utils.logger import create_logger
 from dld.data.utils.audio import slice_audio
 from dld.data.utils.audio import extract as extract_music35
-from contact_res import contact_res
+from concat_res import concat_res
 from dld.data.render_joints.smplfk import ax_from_6v, ax_to_6v
 from dld.data.FineDance_dataset import music2genre, Genres_fd
 
@@ -159,10 +158,6 @@ def split_list(lst, N):
 
 
 def test(cfg):
-    cfg_coarse =  OmegaConf.load('experiments/Global_Module/FineDance_Coarse_Norm_139_WIN10/config_2024-03-06-01-15-26_train.yaml')
-    music2genre_ = music2genre("/data2/lrh/dataset/fine_dance/origin/label_json/")
-    music_dir = "/data2/lrh/dataset/fine_dance/origin/music"    #"/data2/lrh/dataset/fine_dance/div_by_time/music_fea35edge_"
-
     count = 1
     length_co = cfg.length1
     length_fi = cfg.length2
@@ -198,14 +193,6 @@ def test(cfg):
     model_fine.to(device)
     model_fine.eval()
 
-
-    # debug
-    # model_fine_Full = torch.load("experiments/1023edge139_256_35/train/bce_fc2/weights/Full-train-3070.pt")
-    # model_fine_Full.eval() 
-    # model_fine_bad =  EDGE_fine(opt, opt.feature_type, "experiments/1023edge139_256_35/train/bce_fc2/weights/train-3070.pt")
-    # model_fine_bad.eval()
-    # model_fine_good =  EDGE_fine(opt, opt.feature_type, "experiments/edge139_256/1005edge139_256_35/train/weights/train-2500.pt")
-    # model_fine_good.eval()
     
     # elif opt.wavdir != 'None':
     for file in os.listdir(music_dir):
@@ -225,19 +212,8 @@ def test(cfg):
         print("music_fea_full", music_fea_full.shape)
         local_num = music_fea_full.shape[0] // cfg.length2
         music_fea_full = music_fea_full[:local_num * cfg.length2]
-        # peakidx = remove_greater_than(peakidx[1:], local_num * cfg.length2)
-        # peakidx = remove_close_to_multiples(peakidx, cfg.length2)
-        # peakidx = split_list(peakidx, peakidx[-1])
-        # # assert len(peakidx) == local_num
-        # for p_idx in range(local_num):
-        #     peakidx[p_idx] = select_items(peakidx[p_idx])
-        #     # peakidx[p_idx] = peakidx[p_idx] - cfg.length2*p_idx
-        # print("peakidx", peakidx)
-        # print("peakidx", len(peakidx))
 
-        # 刚好整除，只用推理global_num次
         global_num = local_num // (int(cfg.length1/cfg.length2))
-        # 非刚好整除，还要多推理一次
         if local_num % (int(cfg.length1/cfg.length2)) != 0:
             global_num += 1
         # flag = (int(cfg.length1/cfg.length2)) - ( local_num % (int(cfg.length1/cfg.length2)) )
@@ -252,10 +228,6 @@ def test(cfg):
 
             music_fea = torch.from_numpy(music_fea).to(device).unsqueeze(0)
             music_fea = music_fea.repeat(count, 1, 1)
-            # all_filenames = [file_name + 'g' + str(gi).zfill(3) + 'g']*count
-            # all_filenames = [file_name]*count
-
-
             if gi == 0 :
                 music_fea_cat = music_fea
                 all_filenames_cat = [file_name + 'g' + str(gi).zfill(3) + 'g']*count
@@ -313,10 +285,6 @@ def test(cfg):
                 all_localfilename_cat = all_localfilename_cat + [file_name + 'g' + str(rgi).zfill(3) + 'g_' + 'l' + str(item).zfill(3)]
             print("len(molist)", len(molist))
             print("molist[i].shape", molist[0].shape)
-            # assert len(molist) == length_co//length_fi
-            
-            # assert len(molist) == music_fea.shape[0]
-
             modata13_cat.append(modata_13)
             molist_cat += molist
 
@@ -335,29 +303,24 @@ def test(cfg):
 
 
 if __name__ == "__main__":
+    # Select DDIM or DDPM
+    # setmode = "inpaint_soft"      # Using DDPM. It takes times
+    setmode = "inpaint_soft_ddim"   # Using DDIM. Spend less time and get a good performance
+
     cfg = parse_args(phase="demo")
     cfg.FOLDER = cfg.TEST.FOLDER
     cfg.Name = "demo--" + cfg.NAME
     cfg.length1 = 1024
     cfg.length2 = 256
-    cfg.checkpoint1 = 'experiments/Global_Module/FineDance_Coarse_Norm_139_WIN10/checkpoints/epoch=2999.ckpt'
-    # cfg.checkpoint2 = 'experiments/Local_Module/FineDance_relative_Norm_GenreDis_bc190/checkpoints/epoch=1599.ckpt'
-    # cfg.checkpoint2 = 'experiments/Local_Module/FineDance_FineTuneV2_relative_Norm_GenreDis_bc190_adv01/checkpoints/epoch=99.ckpt'
-    # cfg.checkpoint2 = 'experiments/Local_Module/FineDance_FineTuneV3_relative_Norm_GenreDis_bc190_adv01/checkpoints/epoch=799.ckpt'     # FineTuneV3
-    # cfg.checkpoint2 = 'experiments/Local_Module/AFineDance_FineTuneV2_doubleweight_relative_Norm_GenreDis_bc190/checkpoints/epoch=49.ckpt'     # FineTuneV3
-    # cfg.checkpoint2 = 'experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190/checkpoints/epoch=299.ckpt'     # 299  549
-    # cfg.checkpoint2 = 'experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc/checkpoints/epoch=99.ckpt'
-    cfg.checkpoint2 = 'experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc/checkpoints/epoch=299.ckpt'
-
-    # setmode = "inpaint_soft"
-    setmode = "inpaint_soft_ddim"
+    cfg.checkpoint1 = 'exp/Global_Module/FineDance_Global/checkpoints/epoch=2999.ckpt'
+    cfg.checkpoint2 = 'exp/Local_Module/FineDance_FineTuneV2_Local/checkpoints/epoch=299.ckpt'
+    cfg_coarse =  OmegaConf.load('exp/Global_Module/FineDance_Global/global_train.yaml')
+    music2genre_ = music2genre("/data2/lrh/dataset/fine_dance/origin/label_json/")
+    music_dir = "/data2/lrh/dataset/fine_dance/origin/music"  
+    print("cfg.soft", cfg.soft)
+    
 
     logger, final_output_dir = create_logger(cfg, phase="demo")
-    
-    # feature_func = extract_music35
-    # sample_length = cfg.FINEDANCE.full_seq_len * 8 /30
-    # sample_size = int(sample_length / (cfg.FINEDANCE.full_seq_len/60) ) - 1
-
     temp_dir_list = []
     all_cond = []
     all_filenames = []
@@ -365,26 +328,13 @@ if __name__ == "__main__":
 
     print(cfg.checkpoint1.split('.')[0].split('=')[-1])
     output_dir = Path(os.path.join(cfg.FOLDER, str(cfg.model.model_type), str(cfg.NAME),
-                     "debugsamples_dod_" + str(cfg.checkpoint1.split('.')[0].split('=')[-1]) + "_" + str(cfg.checkpoint2.split('.')[0].split('=')[-1]) + "_" + setmode + "_notranscontrol_" + cfg.TIME))
+                     "samples_dod_" + str(cfg.checkpoint1.split('.')[0].split('=')[-1]) + "_" + str(cfg.checkpoint2.split('.')[0].split('=')[-1]) + "_" + setmode + "_notranscontrol_" + cfg.TIME))
     output_dir.mkdir(parents=True, exist_ok=True)
 
     command = ' '.join(sys.argv)
     with open(os.path.join(output_dir, 'command.txt'), 'a') as f:
         f.write(command)
 
-    # test_list = ["211"]
-    # test(cfg)
-    # contact_res(output_dir)
-
     test_list = ["063", "193", "132", "143", "036", "098", "198", "130", "012", "120",  "179", "065", "137", "161", "092",  "037", "109", "204", "144", "211"]  
     test(cfg)
-    contact_res(output_dir)
-
-
-
-
-
-
-'''
-python infer_dod_soft_whole.py --cfg configs/lodge/45/finedance_fea263.yaml --cfg_assets configs/FineDanceCfg/45/assets.yaml --device 7
-'''
+    concat_res(output_dir)

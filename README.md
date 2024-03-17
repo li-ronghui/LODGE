@@ -37,6 +37,40 @@ conda env create -f lodge.yml
 ``` 
 Our environment is similar to EDGE ([official])(https://edge-dance.github.io/). You may check them for more details.
 
+## 🔢🔢🔢 Data preparation
+
+The [FineDance](https://github.com/li-ronghui/FineDance) dataset lasts an average of 152.3 seconds per dance and has a wealth of 22 dance genres, making it ideal for training dance generation, especially long dance generation. Therefore, we mainly use FineDance to conduct experiments. Please visit [here](https://drive.google.com/file/d/1zQvWG9I0H4U3Zrm8d_QD_ehenZvqfQfS/view) to download the origin FineDance dataset and put it in the ./data floder. Please notice that the origin FineDance motion has 52 joints (including 22 body joints and 30 hand joints), we only use the body part dance to train and test Lodge. Therefore, you need to run the following script to preprocess the dataset.
+
+```bash
+python data/code/preprocess.py
+python dld/data/pre/FineDance_normalizer.py
+```
+
+Otherwise, directly download our preprocessed music and dance features from [here](https://drive.google.com/drive/folders/1cdj8YymfN1BHgggVfGaLjaa9vaEpjPzZ?usp=sharing) and put them into the ./data/finedance folder if you don't wish to process the data.
+
+The final file structure is as follows:
+
+```bash
+LODGE
+├── data
+│   ├── code
+│   │   ├──preprocess.py
+│   │   ├──extract_musicfea35.py
+│   ├── finedance
+│   │   ├──label_json
+│   │   ├──motion
+│   │   ├──music_npy
+│   │   ├──music_wav
+│   │   ├──music_npynew
+│   │   ├──mofea319
+│   │── Normalizer.pth
+└   └── smplx_neu_J_1.npy
+```
+
+
+
+
+
 ## 💃💃💃 Training
 
 ```bash
@@ -45,11 +79,15 @@ python train.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets configs/d
 
 ## 🕺🕺🕺 Inference
 Once the training is done, run inference:
-
+The --soft is a float parameter range from 0 to 1, which can set the number of steps for the soft cue guidance action. 
 ```bash
-python infer_lodge.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets configs/data/assets.yaml 
+python infer_lodge.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets configs/data/assets.yaml --soft 1.0
 ```
 
+## 🖥️🖥️🖥️ Rendering
+```bash
+python render.py --modir 'your motion dir'
+```
 
 ## 🔎🔎🔎 Evaluate
 Once the inference is done, run evaluate:
@@ -64,7 +102,7 @@ python metric/foot_skating.py
 
 
 ## 🎼🎼🎼 Citation 
-If you think this project is helpful, please feel free to leave a star⭐️⭐️⭐️ and cite our paper:
+If you think this project is helpful, please leave a star⭐️⭐️⭐️ and cite our paper:
 <!-- ```bibtex
 @article{ma2023follow,
   title={Follow Your Pose: Pose-Guided Text-to-Video Generation using Pose-Free Videos},
@@ -77,4 +115,4 @@ If you think this project is helpful, please feel free to leave a star⭐️⭐�
 
 ## 👯👯👯 Acknowledgements
 
-This repository borrows heavily from [EDGE](https://github.com/Stanford-TML/EDGE) and [Bailando](https://github.com/lisiyao21/Bailando). Thanks the authors for sharing their code and models.
+This basic dance diffusion borrows from [EDGE](https://github.com/Stanford-TML/EDGE), the evaluate code borrows from  [Bailando](https://github.com/lisiyao21/Bailando). the README.md style borrows from [follow-your-pose](https://github.com/follow-your-pose/follow-your-pose.github.io). Thanks the authors for sharing their code and models.

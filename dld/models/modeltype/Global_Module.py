@@ -16,8 +16,6 @@ from dld.config import instantiate_from_config, get_obj_from_str
 from os.path import join as pjoin
 from dld.data.render_joints.smplfk import do_smplxfk
 from dld.data.render_joints.smplfk import SMPLX_Skeleton
-from dld.losses.DanceAE_loss import DanceAE_losses
-from dld.losses.Joints_loss import Joints_losses
 from dld.models.modeltype.base import BaseModel
 from torch.optim import Optimizer
 from pathlib import Path
@@ -391,7 +389,7 @@ class Global_Module(BaseModel):
                 else:
                     motion_rst = self.normalizer.unnormalize(motion_rst)
 
-            if cfg.TEST.DATASETS[0].lower() in ["finedance", "finedance_263cut", "finedance_139cut", "doubledance_263", "doubledance_266", "aistpp", "aistpp_60fps", "aistpp_long263"]:
+            if cfg.TEST.DATASETS[0].lower() in ["finedance",  "finedance_139cut", "aistpp", "aistpp_60fps"]:
                 for i in range(len(motion_rst)):
                     # for bid in range(
                     #         min(cfg.TEST.BATCH_SIZE, samples[i].shape[0])):

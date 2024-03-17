@@ -11,13 +11,12 @@ import time
 from dld.config import instantiate_from_config, get_obj_from_str
 from os.path import join as pjoin
 from dld.data.render_joints.smplfk import SMPLX_Skeleton
-from dld.losses.DanceAE_loss import DanceAE_losses
 from dld.losses.Joints_loss import Joints_losses
 from dld.models.modeltype.base import BaseModel
 from dld.models.architectures.model import AdversarialLoss, DanceDiscriminator
 from torch.optim import Optimizer
 from pathlib import Path
-from render_aist import ax_from_6v,ax_to_6v
+from render import ax_from_6v,ax_to_6v
 
 
 from .base import BaseModel
@@ -539,59 +538,21 @@ class Local_Module(BaseModel):
                 else:
                     motion_rst = self.normalizer.unnormalize(motion_rst)
 
-            if cfg.TEST.DATASETS[0].lower() in ["finedance", "finedance_263cut", "finedance_139cut", "doubledance_263", "doubledance_266", "aistpp",  "aistpp_60FPS", "aistpp_long263"]:
+            if cfg.TEST.DATASETS[0].lower() in ["finedance",  "finedance_139cut",  "aistpp",  "aistpp_60FPS"]:
                 for i in range(len(motion_rst)):
-                    # for bid in range(
-                    #         min(cfg.TEST.BATCH_SIZE, samples[i].shape[0])):
-                    #     keyid = keyids[i * cfg.TEST.BATCH_SIZE + bid]
-                    #     gen_joints = samples[i][bid].cpu().numpy()
-                    if cfg.FINEDANCE.mode in ['double', 'double_react']:
-                        if cfg.TEST.REPLICATION_TIMES > 1:
-                            if phase == 'test':
-                                name_a = f"{str(i).zfill(3)}_{cfg.TEST.REP_I}" + "_a"
-                                name_b = f"{str(i).zfill(3)}_{cfg.TEST.REP_I}" + "_b"
-                            elif phase == 'val':
-                                name_a = f"{str(i).zfill(3)}_{str(epoch)}"+ "_a"
-                                name_b = f"{str(i).zfill(3)}_{str(epoch)}"+ "_b"
-                        else:
-                            name_a = f"{str(i).zfill(3)}_a.npy"
-                            name_b = f"{str(i).zfill(3)}_b.npy"
-
-                        # save predictions results
-                        npypath_a = os.path.join(output_dir, name_a)
-                        npypath_b = os.path.join(output_dir, name_b)
-                        np.save(npypath_a, motion_rst_a[i].detach().cpu().numpy())
-                        np.save(npypath_b, motion_rst_b[i].detach().cpu().numpy())
+                    if cfg.TEST.REPLICATION_TIMES > 1:
+                        if phase == 'test':
+                            name = f"{str(i).zfill(3)}_{cfg.TEST.REP_I}"
+                        elif phase == 'val':
+                            name = f"{str(i).zfill(3)}_{str(epoch)}"
                     else:
-                        if cfg.TEST.REPLICATION_TIMES > 1:
-                            if phase == 'test':
-                                name = f"{str(i).zfill(3)}_{cfg.TEST.REP_I}"
-                            elif phase == 'val':
-                                name = f"{str(i).zfill(3)}_{str(epoch)}"
-                        else:
-                            name = f"{str(i).zfill(3)}.npy"
-                        # save predictions results
-                        npypath = os.path.join(output_dir, name)
-                        # print(npypath)
-                        np.save(npypath, motion_rst[i].detach().cpu().numpy())
+                        name = f"{str(i).zfill(3)}.npy"
+                    # save predictions results
+                    npypath = os.path.join(output_dir, name)
+                    # print(npypath)
+                    np.save(npypath, motion_rst[i].detach().cpu().numpy())
             else:
                 raise("cfg.TEST.DATASETS is not finedance!")
-
-            
-# class EdgeLoss(Metric):
-#     def __init__(self, cfg):
-#         super().__init__(dist_sync_on_step=cfg.LOSS.DIST_SYNC_ON_STEP)
-    
-#     losses = []
-#     losses.append("total")
-    
-#     losses.append("recons__loss")
-#     losses.append("recons__v_loss")
-#     losses.append("recons__fk_loss")
-#     losses.append("foot__loss")
-    
-#     def update(self, rs_set):
-#         total: float = 0.0
         
         
 def exists(val):

@@ -16,10 +16,10 @@ from pytorch3d.transforms import (axis_angle_to_quaternion,
 from tqdm import tqdm
 
 from dld.data.utils.preprocess import ax_from_6v, quat_slerp
-# from vis import skeleton_render
-from render_aist import ax_to_6v
 from .utils import extract, make_beta_schedule
 from dld.data.render_joints.utils.motion_process import recover_from_ric
+from dld.data.render_joints.smplfk import ax_to_6v
+
 
 def identity(t, *args, **kwargs):
     return t
@@ -403,8 +403,9 @@ class GaussianDiffusion(nn.Module):
         value = constraint["value"].to(device)  # batch x horizon x channels
 
         start_point = self.n_timestep if start_point is None else start_point
+        print("start_point", start_point)
         for i in tqdm(reversed(range(0, start_point))):
-            if int(i) > 0:  # self.opt.hint:        # 数字越小控制soft hint效果越强
+            if int(i) > start_point*(1-self.cfg.soft):  # self.opt.hint:        # 数字越小控制soft hint效果越强
                 # fill with i
                 timesteps = torch.full((batch_size,), i, device=device, dtype=torch.long)
 
@@ -537,10 +538,7 @@ class GaussianDiffusion(nn.Module):
                   c * pred_noise + \
                   sigma * noise
             
-            # if time > 0:
-            #     # the first half of each sequence is the second half of the previous one
-            #     x[1:, :half] = x[:-1, half:]
-            if time > 0:
+            if time > 50*(1-self.cfg.soft):
                 x = value * mask + (1.0 - mask) * x
             x[:, :4, :] = value[:, :4, :]  * mask[:, :4, :]  + (1.0 - mask[:, :4, :] ) * x[:, :4, :] 
             x[:, -4:, :] = value[:, -4:, :]  * mask[:, -4:, :]  + (1.0 - mask[:, -4:, :] ) * x[:, -4:, :]
@@ -571,180 +569,6 @@ class GaussianDiffusion(nn.Module):
 
         return sample
     
-
-    def loss_263(self, model_out, target, t): 
-        mseloss = self.loss_fn(model_out, target, reduction="none")            #  mse loss
-        mseloss = reduce(mseloss, "b ... -> b (...)", "mean")
-        mseloss = mseloss * extract(self.p2_loss_weight, t, mseloss.shape)
-
-        v_loss = self.loss_fn(model_out[..., 4 : (22 - 1) * 3 + 4], target[..., 4 : (22 - 1) * 3 + 4], reduction="none")
-        v_loss = reduce(v_loss, "b ... -> b (...)", "mean")
-        v_loss = v_loss * extract(self.p2_loss_weight, t, v_loss.shape)
- 
-        losses = (
-                self.cfg.LOSS.LAMBDA_LOSS           * mseloss.mean(),
-                self.cfg.LOSS.LAMBDA_V              * v_loss.mean(),
-            )
-        total_loss, (mseloss, v_loss) = sum(losses), losses
-        loss_dict = {}
-        loss_dict.update({
-                    "loss": total_loss,
-                    "mseloss": mseloss,
-                    "v_loss": v_loss,
-                })
-        return loss_dict
-    
-    def loss_263_Coarse(self, model_out, target, t): 
-        B, T, C = model_out.shape
-        model_out = model_out.reshape(-1, 8, C)
-        target = target.reshape(-1, 8, C)
-        t = t.repeat(int(target.shape[0]//B)  )
-
-        mseloss = self.loss_fn(model_out, target, reduction="none")            #  mse loss
-        mseloss = reduce(mseloss, "b ... -> b (...)", "mean")
-        mseloss = mseloss * extract(self.p2_loss_weight, t, mseloss.shape)
-
-        v_loss = self.loss_fn(model_out[..., 4 : (22 - 1) * 3 + 4], target[..., 4 : (22 - 1) * 3 + 4], reduction="none")
-        v_loss = reduce(v_loss, "b ... -> b (...)", "mean")
-        v_loss = v_loss * extract(self.p2_loss_weight, t, v_loss.shape)
- 
-        losses = (
-                self.cfg.LOSS.LAMBDA_LOSS           * mseloss.mean(),
-                self.cfg.LOSS.LAMBDA_V              * v_loss.mean(),
-            )
-        total_loss, (mseloss, v_loss) = sum(losses), losses
-        loss_dict = {}
-        loss_dict.update({
-                    "loss": total_loss,
-                    "mseloss": mseloss,
-                    "v_loss": v_loss,
-                })
-        return loss_dict
-
-    def loss_266_double_react(self, model_out, cond, target, t): 
-        input_motion = cond[..., 35:]
-        assert input_motion.shape[-1] == 266
-        input_pos, input_ang = input_motion[..., :3], input_motion[..., 3:4]
-        input_root = torch.cat([input_pos, input_ang],dim=-1)
-        pred_pos, pred_ang = model_out[..., :3], model_out[..., 3:4]
-        pred_root = torch.cat([pred_pos, pred_ang],dim=-1)
-        gt_pos, gt_ang = target[..., :3], target[..., 3:4]
-        gt_root = torch.cat([gt_pos, gt_ang],dim=-1)
-
-        loss_root_g = self.loss_fn(pred_root, gt_root, reduction="none")           
-        loss_root_g = reduce(loss_root_g, "b ... -> b (...)", "mean")
-        loss_root_g = loss_root_g * extract(self.p2_loss_weight, t, loss_root_g.shape)
-
-        # velocity loss
-        pred_root_v = pred_root[:, 1:] - pred_root[:, :-1]
-        gt_root_v = gt_root[:, 1:] - gt_root[:, :-1]
-        loss_root_v = self.loss_fn(pred_root_v, gt_root_v, reduction="none")           
-        loss_root_v = reduce(loss_root_v, "b ... -> b (...)", "mean")
-        loss_root_v = loss_root_v * extract(self.p2_loss_weight, t, loss_root_v.shape)
-
-        # relative_loss
-        pred_root_r = pred_root - input_root
-        gt_root_r = gt_root - input_root
-        loss_root_r = self.loss_fn(pred_root_r, gt_root_r, reduction="none")           
-        loss_root_r = reduce(loss_root_r, "b ... -> b (...)", "mean")
-        loss_root_r = loss_root_r * extract(self.p2_loss_weight, t, loss_root_r.shape)
-
-        mseloss = self.loss_fn(model_out[..., 4:], target[..., 4:], reduction="none")            #  mse loss
-        mseloss = reduce(mseloss, "b ... -> b (...)", "mean")
-        mseloss = mseloss * extract(self.p2_loss_weight, t, mseloss.shape)
-
-        v_loss = self.loss_fn(model_out[..., 4 : (22 - 1) * 3 + 4], target[..., 4 : (22 - 1) * 3 + 4], reduction="none")
-        v_loss = reduce(v_loss, "b ... -> b (...)", "mean")
-        v_loss = v_loss * extract(self.p2_loss_weight, t, v_loss.shape)
-
-        LAMBDA_LOSS        = self.cfg.LOSS.LAMBDA_LOSS        
-        LAMBDA_V           = self.cfg.LOSS.LAMBDA_V           
-        LAMBDA_ROOT_Global = self.cfg.LOSS.LAMBDA_ROOT_Global 
-        LAMBDA_ROOT_V      = self.cfg.LOSS.LAMBDA_ROOT_V      
-        LAMBDA_ROOT_R      = self.cfg.LOSS.LAMBDA_ROOT_R      
-
-        losses = (
-                LAMBDA_LOSS           * mseloss.mean(),
-                LAMBDA_V              * v_loss.mean(),
-                LAMBDA_ROOT_Global    * loss_root_g.mean(),
-                LAMBDA_ROOT_V         * loss_root_v.mean(),
-                LAMBDA_ROOT_R         * loss_root_r.mean(),
-            )
-        total_loss, (mseloss, v_loss, root_Global, root_V, root_R) = sum(losses), losses
-        loss_dict = {}
-        loss_dict.update({
-                    "loss": total_loss,
-                    "mseloss": mseloss,
-                    "v_loss": v_loss,
-                    "ROOT_Global": root_Global,
-                    "ROOT_V": root_V,
-                    "ROOT_R": root_R,
-                })
-        return loss_dict
-    
-
-    def loss_266_double(self, model_out, target, t): 
-        assert model_out.shape[-1] == 266*2
-        pred_motion_a = model_out[..., :266]
-        pred_motion_b = model_out[..., 266:]
-        pred_pos_a, pred_ang_a = pred_motion_a[..., :3], pred_motion_a[..., 3:4]
-        pred_root_a = torch.cat([pred_pos_a, pred_ang_a],dim=-1)
-        pred_pos_b, pred_ang_b = pred_motion_b[..., :3], pred_motion_b[..., 3:4]
-        pred_root_b = torch.cat([pred_pos_b, pred_ang_b],dim=-1)
-
-        gt_motion_a = target[..., :266]
-        gt_motion_b = target[..., 266:]
-        gt_pos_a, gt_ang_a = gt_motion_a[..., :3], gt_motion_a[..., 3:4]
-        gt_root_a = torch.cat([gt_pos_a, gt_ang_a],dim=-1)
-        gt_pos_b, gt_ang_b = gt_motion_b[..., :3], gt_motion_b[..., 3:4]
-        gt_root_b = torch.cat([gt_pos_b, gt_ang_b],dim=-1)
-
-        loss_root_g = self.loss_fn(pred_root_a+pred_root_b, gt_root_a+gt_root_b, reduction="none")           
-        loss_root_g = reduce(loss_root_g, "b ... -> b (...)", "mean")
-        loss_root_g = loss_root_g * extract(self.p2_loss_weight, t, loss_root_g.shape)
-
-        # velocity loss
-        pred_root_a_v = pred_root_a[:, 1:] - pred_root_a[:, :-1]
-        gt_root_a_v = gt_root_a[:, 1:] - gt_root_a[:, :-1]
-        pred_root_b_v = pred_root_b[:, 1:] - pred_root_a[:, :-1]
-        gt_root_b_v = gt_root_b[:, 1:] - gt_root_a[:, :-1]
-        loss_root_v = self.loss_fn(pred_root_a_v+pred_root_b_v, gt_root_a_v+gt_root_b_v, reduction="none")           
-        loss_root_v = reduce(loss_root_v, "b ... -> b (...)", "mean")
-        loss_root_v = loss_root_v * extract(self.p2_loss_weight, t, loss_root_v.shape)
-
-        # relative_loss
-        pred_root_ar = pred_root_b - pred_root_a
-        gt_root_ar = gt_root_b - gt_root_a
-        loss_root_r = self.loss_fn(pred_root_ar, gt_root_ar, reduction="none")           
-        loss_root_r = reduce(loss_root_r, "b ... -> b (...)", "mean")
-        loss_root_r = loss_root_r * extract(self.p2_loss_weight, t, loss_root_r.shape)
-
-        mseloss = self.loss_fn(pred_motion_a[..., 4:]+pred_motion_b[..., 4:], gt_motion_a[..., 4:]+gt_motion_b[..., 4:], reduction="none")            #  mse loss
-        mseloss = reduce(mseloss, "b ... -> b (...)", "mean")
-        mseloss = mseloss * extract(self.p2_loss_weight, t, mseloss.shape)
-
-        v_loss = self.loss_fn(pred_motion_a[..., 4 : (22 - 1) * 3 + 4]+pred_motion_b[..., 4 : (22 - 1) * 3 + 4], gt_motion_a[..., 4 : (22 - 1) * 3 + 4]+gt_motion_b[..., 4 : (22 - 1) * 3 + 4], reduction="none")
-        v_loss = reduce(v_loss, "b ... -> b (...)", "mean")
-        v_loss = v_loss * extract(self.p2_loss_weight, t, v_loss.shape) 
-
-        losses = (
-                self.cfg.LOSS.LAMBDA_LOSS           * mseloss.mean(),
-                self.cfg.LOSS.LAMBDA_V              * v_loss.mean(),
-                self.cfg.LOSS.LAMBDA_ROOT_Global    * loss_root_g.mean(),
-                self.cfg.LOSS.LAMBDA_ROOT_V         * loss_root_v.mean(),
-                self.cfg.LOSS.LAMBDA_ROOT_R         * loss_root_r.mean(),
-            )
-        total_loss, (mseloss, v_loss, root_Global, root_V, root_R) = sum(losses), losses
-        loss_dict = {}
-        loss_dict.update({
-                    "loss": total_loss,
-                    "mseloss": mseloss,
-                    "v_loss": v_loss,
-                    "ROOT_Global": root_Global,
-                    "ROOT_V": root_V,
-                    "ROOT_R": root_R,
-                })
-        return loss_dict
     
 
     def smpl_loss(self, model_out_ori, target_ori, t):
@@ -848,7 +672,7 @@ class GaussianDiffusion(nn.Module):
         target_contact, target = torch.split(target_ori, (4, target_ori.shape[2] - 4), dim=2)       # b, length, jxc
 
 
-        # model_x为root position, model_q为rotation
+        # model_x  is root position, model_q  is rotation
         model_x = model_out[:, :, :3]   # root position
         model_q = ax_from_6v(model_out[:, :, 3:].reshape(b, s, -1, 6))      # 以rot6d方式训练
         target_x = target[:, :, :3]
@@ -1005,30 +829,14 @@ class GaussianDiffusion(nn.Module):
         else:
             target = x_start
 
-        # if self.transition_dim == 139 or self.transition_dim == 135 or self.transition_dim == 319  or self.transition_dim == 315:
-        #     total_loss, losses = self.smpl_loss(model_out, target, t)
-        # elif self.transition_dim == 263 or self.transition_dim == 266:
-        #     total_loss, losses = self.loss_263(model_out, target, t)
-        if self.cfg.model.model_type == 'Global_Module':
-            if self.cfg.LOSS.TYPE == 'smpl_loss':
-                loss_dict = self.smpl_loss(model_out, target, t)
-            elif self.cfg.LOSS.TYPE == 'smpl_loss_relative':
-                loss_dict = self.smpl_loss_relative(model_out, target, t)
-            elif self.cfg.LOSS.TYPE == 'loss_263':
-                loss_dict = self.loss_263_Coarse(model_out, target, t)
-            else:
-                raise("error of motion representation")
+        if self.cfg.LOSS.TYPE == 'smpl_loss':
+            loss_dict = self.smpl_loss(model_out, target, t)
+        elif self.cfg.LOSS.TYPE == 'smpl_loss_relative':
+            loss_dict = self.smpl_loss_relative(model_out, target, t)
         else:
-            if self.cfg.LOSS.TYPE == 'smpl_loss':
-                loss_dict = self.smpl_loss(model_out, target, t)
-            elif self.cfg.LOSS.TYPE == 'smpl_loss_relative':
-                loss_dict = self.smpl_loss_relative(model_out, target, t)
-            elif self.cfg.LOSS.TYPE == 'loss_263':
-                loss_dict = self.loss_263(model_out, target, t)
-            elif self.cfg.LOSS.TYPE == 'loss_266_double_react':
-                loss_dict = self.loss_266_double_react(model_out, cond, target, t)
-            elif self.cfg.LOSS.TYPE == 'loss_266_double':
-                loss_dict = self.loss_266_double(model_out, target, t)
+            raise("error of motion representation")
+     
+            
 
         if self.cfg.Discriminator:
             return loss_dict, model_out
@@ -1192,14 +1000,12 @@ class GaussianDiffusion(nn.Module):
                     full_pos = full_pos.unsqueeze(0)
                 else:
                     full_pos = pos
-                    # full_q = q
 
                 Path(fk_out).mkdir(parents=True, exist_ok=True)
                 for num, (full_pos_one, filename) in enumerate(zip(full_pos, name)):
                     filename = os.path.basename(filename).split(".")[0]
                     outname = f"{epoch}_{num}_{filename}.npy"
                     np.save(f"{fk_out}/{outname}", full_pos_one)
-
             else:
                 b, s, c1, c2 = q.shape
                 assert s % 2 == 0
@@ -1253,25 +1059,6 @@ class GaussianDiffusion(nn.Module):
                     full_pos = pos
                     full_q = q
                     
-                # model_xp = self.smplx_fk.forward(model_q, model_x)
-                # full_pose = self.smplx_fk.forward(full_q, full_pos).view(b, s, -1, 3).detach().cpu().numpy()      # # b, s, 52, 3
-                # b_, s_, j_, c_ =  full_pose.shape
-                # full_pose = (
-                #     self.smpl.forward(full_q, full_pos).detach().cpu().numpy()
-                # )  # b, s, 24, 3
-                # squeeze the batch dimension away and render
-                
-                # skeleton_render(
-                #     full_pose[0],
-                #     epoch=f"{epoch}",
-                #     out=render_out,
-                #     name=name,
-                #     sound=sound,
-                #     sound_folder=sound_folder,
-                #     render=render,
-                #     stitch=False,
-                #     smpl_mode="smplx"
-                # )
                 
                 if fk_out is not None:
                     outname = f'{epoch}_{"_".join(os.path.splitext(os.path.basename(name[0]))[0].split("_")[:-1])}.pkl'  # f'{epoch}_{"_".join(name)}.pkl' #
@@ -1286,50 +1073,12 @@ class GaussianDiffusion(nn.Module):
                     )
                 return
 
-        # print("before smplx_fk.forward")
-        # poses = self.smplx_fk.forward(q, pos).detach().cpu().numpy()
-        # print("after smplx_fk.forward")
-        # sample_contact = (
-        #     sample_contact.detach().cpu().numpy()
-        #     if sample_contact is not None
-        #     else None
-        # )
-        # def inner(xx):
-        #     num, pose = xx
-        #     filename = name[num] if name is not None else None
-        #     contact = sample_contact[num] if sample_contact is not None else None
-        #     skeleton_render(
-        #         pose,
-        #         epoch=f"e{epoch}_b{num}",
-        #         out=render_out,
-        #         name=filename,
-        #         sound=sound,
-        #         contact=contact,
-        #     )
-
-        # p_map(inner, enumerate(poses))      # poses: 2, 150, 52, 3
-        # print("4")
-
         if self.cfg.FINEDANCE.nfeats != 263:
             if fk_out is not None and mode != "long":
-                # print("saving data!")
-                # print("fk_out is", fk_out)
                 Path(fk_out).mkdir(parents=True, exist_ok=True)
                 # for num, (qq, pos_, filename, pose) in enumerate(zip(q, pos, name, poses)):
                 for num, (sample_contact, qq, pos_, filename) in enumerate(zip(sample_contacts, q, pos, name)):
                     filename = os.path.basename(filename).split(".")[0]
-                    # outname = f"{epoch}_{num}_{filename}.pkl"
-                    # print('saved pos_ shape', pos_.shape)
-                    # print(" ")
-                    # pickle.dump(
-                    #     {
-                    #         "smpl_poses": qq.reshape((-1, reshape_size)).cpu().numpy(),
-                    #         "smpl_trans": pos_.cpu().numpy(),
-                    #         # "full_pose": pose,
-                    #     },
-                    #     open(f"{fk_out}/{outname}", "wb"),
-                    # )
-                    
                     outname = f"{epoch}_{num}_{filename}.npy"
                     qq_rot6d = ax_to_6v(qq).reshape(pos_.shape[0], -1)
                     print("sample_contact", sample_contact.shape)
@@ -1340,8 +1089,6 @@ class GaussianDiffusion(nn.Module):
                     np.save(os.path.join(fk_out, outname), result_data)
         else:
             if fk_out is not None and mode != "long":
-                # print("saving data!")
-                # print("fk_out is", fk_out)
                 Path(fk_out).mkdir(parents=True, exist_ok=True)
                 # for num, (qq, pos_, filename, pose) in enumerate(zip(q, pos, name, poses)):
                 for num, (sample, filename) in enumerate(zip(samples, name)):

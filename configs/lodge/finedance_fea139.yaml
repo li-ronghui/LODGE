@@ -37,14 +37,14 @@ TRAIN:
 
 EVAL:
   SPLIT: 'gtest'
-  BATCH_SIZE: 256 # Evaluating Batch size
+  BATCH_SIZE: 32 # Evaluating Batch size
   NUM_WORKERS: 16 # Evaluating Batch size
 
 TEST:
   TEST_DIR: ''
   CHECKPOINTS: '' #/data2/lrh/project/dance/Lodge/lodge_pylight/experiments/Edge_Module/0115_newNorm_256len_263_diff_bc768/checkpoints/epoch=3899.ckpt 
   SPLIT: 'gtest'
-  BATCH_SIZE: 256 # Testing Batch size
+  BATCH_SIZE: 32 # Testing Batch size
   NUM_WORKERS: 12 # Evaluating Batch size
   SAVE_PREDICTIONS: True # Weather to save predictions
   COUNT_TIME: False # Weather to count time during test
@@ -159,10 +159,10 @@ DEMO:
   use_cached_features: false
 
 FINEDANCE:
-  mix: False           # 是否做混合的数据增强
+  mix: False           # weather do mix data augmention
   full_seq_len: 256   # 150
   windows: 8  # 16   #40   #
-  is_mirror: False    # 是否做镜像的数据增强
+  is_mirror: False    # weather do mirror data augmention
   nfeats: 139
   njoints: 22   
   mode: single  # "single" , "double_react", "double"

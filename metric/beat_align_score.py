@@ -24,19 +24,10 @@ def get_mb(key, length=None):
         else:
             beats = np.array(sample_dict['music_array'])[:, 53]
 
-
         beats = beats.astype(bool)
         beat_axis = np.arange(len(beats))
         beat_axis = beat_axis[beats]
-        
-        # fig, ax = plt.subplots()
-        # ax.set_xticks(beat_axis, minor=True)
-        # # ax.set_xticks([0.3, 0.55, 0.7], minor=True)
-        # ax.xaxis.grid(color='deeppink', linestyle='--', linewidth=1.5, which='minor')
-        # ax.xaxis.grid(True, which='minor')
-
-
-        # print(len(beats))
+    
         return beat_axis
     
 def get_music_beat_fromwav(fpath, length):
@@ -128,7 +119,6 @@ def calc_ba_score(motionroot, musicroot):
         else:
             continue
         assert len(joint3d.shape) == 3      # T, J, 3
-        # 起始位置归0
         joint3d = joint3d.reshape(joint3d.shape[0], 24*3).detach().cpu().numpy()
         roott = joint3d[:1, :3]
         joint3d = joint3d - np.tile(roott, (1, 24)) 
@@ -145,59 +135,10 @@ def calc_ba_score(motionroot, musicroot):
 
 if __name__ == '__main__':
     music_root = "/data2/lrh/dataset/fine_dance/origin/music"
-    # aa = np.random.randn(39, 72)*
-    # bb = np.random.randn(39, 72)*0.1
-    # print(calc_fid(aa, bb))
     smplx_model = SMPLX_Skeleton()
-    # gt_root = '/mnt/lustre/lisiyao1/dance/bailando/aist_features_zero_start'
-    # pred_root = '/mnt/lustressd/lisiyao1/dance_experiements/experiments/sep_vqvae_root_global_vel_wav_acc_batch8/vis/pkl/ep000500'
-    # pred_root = ''
-    # pred_root = '/mnt/lustressd/lisiyao1/dance_experiements/experiments/music_ccgpt2_ac_ba_1e-5_freeze_droupout_beta0.5/vis/pkl/ep000005'
-    
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_gpt_ds8_lbin512_c512_di3full/eval/pkl/ep000300'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_cross_cond_gpt_ds8_lbin512_c512_di3_init_0.01_beta0.9_full_dim768_3_9_9_ac_reward2_with_entropy_loss_alpha0.5_lr1e-4_no_pretrain/eval/pkl/ep000020'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_cross_cond_gpt_ds8_lbin512_c512_di3_init_0.01_beta0.9_full_dim768_3_9_9_ac_reward2_with_entropy_loss_alpha0.5_lr1e-4_no_pretrain/vis/pkl/ep000300'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_cross_cond_gpt_ds8_lbin512_c512_di3_init_0.01_beta0.9_full_dim768_wav_bsz_16_layer6/eval/pkl/ep000040'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/sep_vqvae_root_data_l1_d8_local_c512_di3_global_vel_full_beta0.9_1e-4_wav_beta0.5/eval/pkl/ep000300'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_cross_cond_gpt_ds8_lbin512_c512_di3_init_0.01_beta0.9_full_dim768_wav/eval/pkl/ep000300'
-    # pred_root = '/mnt/lustre/lisiyao1/dance/bailando/experiments/music_cross_cond_gpt_ds8_lbin512_c512_di3_init_0.01_beta0.9_full_dim768_666_ac_reward2_with_entropy_loss_alpha0.5_lr1e-4_no_pretrain/vis/pkl/ep000080'
-    # print('Calculating and saving features')
-
-    # gt_root = '/data2/lrh/dataset/fine_dance/origin/motion_feature319'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/test2/concat/npy'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/infer/clip8_139/FineDance_1007_1024_win128/1012/test1_soft_with4ctc'
-
-    # pred_root = '/data2/lrh/project/dance/long/experiments/compare/mnet/data1min'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/compare/fact/data1min'
-    # pred_root = 'experiments/compare/gpt/experiments/infer/clip8_139/FineDance_1007_1024_win128/1107/res1_hint0'
-    # pred_root = 'experiments/compare/edge/edge_5_long/2175/npy'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint0_trans/concat/npy'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint0/concat/npy'
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint100/concat/npy'
-
-
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint0/concat/npy'
-    # pred_root = '/data2/lrh/dataset/fine_dance/gound/mofea319/testset'
-    # pred_root= "experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/whole/res1_hint0_beat_nomirror/concat/npy"
-
-
-    # pred_root = '/data2/lrh/project/dance/long/experiments/results/zero/1023edge139_256_35/bce_fc2/inferdodsoft/ddim_0/concat/npy'
-    # pred_root = '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_299_inpaint_soft_notranscontrol_2024-03-11-21-05-27/concat/npy'
-    # pred_root = '/data2/lrh/project/dance/Lodge/lodge302/experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_549_inpaint_soft_notranscontrol_2024-03-11-21-05-44/concat/npy/'
-    # pred_root = 'experiments/Local_Module/AFineDance_FineTuneV2_originweight_relative_Norm_GenreDis_bc190_nofc/samples_dod2999_199_inpaint_soft_notranscontrol_2024-03-12-04-53-44/concat/npy'
-    pred_root = 'dance_results/Local_Module/AFineDance_NoFootBlock_V2_originweight_relative_Norm_GenreDis_bc190/samples_dod2999_1499_inpaint_soft_notranscontrol_2024-03-14-05-01-56/concat/npy'
-    # pred_root =  '/data2/lrh/dataset/fine_dance/gound/mofea319/'
-
-
-
+    pred_root = '/data2/lrh/project/dance/Lodge/lodge_pub/experiments/Local_Module/FineDance_FineTuneV2_Local/samples_dod_2999_299_inpaint_soft_ddim_notranscontrol_2024-03-16-04-29-01/concat/npy'
 
     print('Calculating pred metrics')
     print(pred_root)
     print(calc_ba_score(pred_root, music_root))
-    # print('Calculating gt metrics')
-    # print(calc_ba_score(gt_root, music_root))
-
-    # print('Calculating metrics')
-    # print(gt_root)
-    # print(pred_root)
-    # print(quantized_metrics(pred_root, gt_root))
+  

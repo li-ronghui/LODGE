@@ -66,8 +66,7 @@ def _get_tempo(audio_name):
         assert False, audio_name
 
 
-def extract(fpath, skip_completed=True, dest_dir="aist_baseline_feats", fps=30):
-    os.makedirs(dest_dir, exist_ok=True)
+def extract(fpath, skip_completed=True, dest_dir="music_baseline_feats", fps=30):
     audio_name = Path(fpath).stem
     save_path = os.path.join(dest_dir, audio_name + ".npy")
 
@@ -112,6 +111,6 @@ def extract(fpath, skip_completed=True, dest_dir="aist_baseline_feats", fps=30):
     # chop to ensure exact shape
     # audio_feature = audio_feature[:5 * FPS]
     # assert (audio_feature.shape[0] - 5 * FPS) == 0, f"expected output to be ~5s, but was {audio_feature.shape[0] / FPS}"
-
-    #np.save(save_path, audio_feature)
+    # os.makedirs(dest_dir, exist_ok=True)
+    # np.save(save_path, audio_feature)
     return audio_feature, save_path
