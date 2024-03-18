@@ -46,7 +46,7 @@ python data/code/preprocess.py
 python dld/data/pre/FineDance_normalizer.py
 ```
 
-Otherwise, directly download our preprocessed music and dance features from [Google Driver](https://drive.google.com/drive/folders/1cdj8YymfN1BHgggVfGaLjaa9vaEpjPzZ?usp=sharing) or [百度云](https://pan.baidu.com/s/1i4sTCqCEtxSUR3GspGGfQQ?pwd=ekc0) and put them into the ./data/finedance folder if you don't wish to process the data.
+Otherwise, directly download our preprocessed music and dance features from [Google Driver](https://drive.google.com/drive/folders/1cdj8YymfN1BHgggVfGaLjaa9vaEpjPzZ?usp=sharing) or [百度云](https://pan.baidu.com/s/1PQ53ooKxp-EkQvhiv7SKcA?pwd=y0ly) and put them into the ./data/finedance folder if you don't wish to process the data.
 
 The final file structure is as follows:
 
