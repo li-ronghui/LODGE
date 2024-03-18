@@ -119,6 +119,13 @@ If you think this project is helpful, please leave a star⭐️⭐️⭐️ and 
   booktitle={IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
   year={2024},
 }
+@inproceedings{li2023finedance,
+  title={FineDance: A Fine-grained Choreography Dataset for 3D Full Body Dance Generation},
+  author={Li, Ronghui and Zhao, Junfan and Zhang, Yachao and Su, Mingyang and Ren, Zeping and Zhang, Han and Tang, Yansong and Li, Xiu},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={10234--10243},
+  year={2023}
+}
 ``` 
 
 
