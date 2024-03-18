@@ -14,7 +14,7 @@
 
 
 ## 💃💃💃 Abstract
-<b>TL;DR: We propose a two-stage diffusion modle that can generate extremely long dance from given music in a parallel manner.</b>
+<b>TL;DR: We propose a two-stage diffusion model that can generate extremely long dance from given music in a parallel manner.</b>
 
 <details><summary>CLICK for full abstract</summary>
 
@@ -112,14 +112,14 @@ python metric/foot_skating.py
 
 ## 🎼🎼🎼 Citation 
 If you think this project is helpful, please leave a star⭐️⭐️⭐️ and cite our paper:
-<!-- ```bibtex
-@article{ma2023follow,
-  title={Follow Your Pose: Pose-Guided Text-to-Video Generation using Pose-Free Videos},
-  author={Ma, Yue and He, Yingqing and Cun, Xiaodong and Wang, Xintao and Shan, Ying and Li, Xiu and Chen, Qifeng},
-  journal={arXiv preprint arXiv:2304.01186},
-  year={2023}
+```bibtex
+@inproceedings{li2023lodge,
+  title={Lodge: A Coarse to Fine Diffusion Network for Long Dance Generation Guided by the Characteristic Dance Primitives},
+  author={Ronghui Li, Yuxiang Zhang, Yachao Zhang, Hongwen Zhang, Jie Guo, Yan Zhang, Yebin Liu and Xiu Li},
+  booktitle={IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
+  year={2024},
 }
-```  -->
+``` 
 
 
 ## 👯👯👯 Acknowledgements
