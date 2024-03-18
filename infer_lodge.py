@@ -197,9 +197,8 @@ def test(cfg):
     # elif opt.wavdir != 'None':
     for file in os.listdir(music_dir):
         flag = 0
-        if len(os.listdir(music_dir)) > 200 and 'fine_dance' in music_dir:
-            if not file[:3] in test_list:
-                continue
+        if not file[:3] in test_list:
+            continue
 
         file_name = file[:-4]
         mufile = os.path.join(music_dir, file)
@@ -288,6 +287,8 @@ def test(cfg):
             modata13_cat.append(modata_13)
             molist_cat += molist
 
+
+        print("file ", file)
         genre = music2genre_[file[:3]]
         genre = np.array(Genres_fd[genre])
         genre = torch.from_numpy(genre).unsqueeze(0)
@@ -305,7 +306,7 @@ def test(cfg):
 if __name__ == "__main__":
     # Select DDIM or DDPM
     # setmode = "inpaint_soft"      # Using DDPM. It takes times
-    setmode = "inpaint_soft_ddim"   # Using DDIM. Spend less time and get a good performance
+    setmode = "inpaint_soft_ddim"   # Using DDIM. Spend less time and get a comparable performance
 
     cfg = parse_args(phase="demo")
     cfg.FOLDER = cfg.TEST.FOLDER
@@ -315,8 +316,8 @@ if __name__ == "__main__":
     cfg.checkpoint1 = 'exp/Global_Module/FineDance_Global/checkpoints/epoch=2999.ckpt'
     cfg.checkpoint2 = 'exp/Local_Module/FineDance_FineTuneV2_Local/checkpoints/epoch=299.ckpt'
     cfg_coarse =  OmegaConf.load('exp/Global_Module/FineDance_Global/global_train.yaml')
-    music2genre_ = music2genre("/data2/lrh/dataset/fine_dance/origin/label_json/")
-    music_dir = "/data2/lrh/dataset/fine_dance/origin/music"  
+    music2genre_ = music2genre("data/finedance/label_json")
+    music_dir = "data/finedance/music"  
     print("cfg.soft", cfg.soft)
     
 

@@ -23,7 +23,6 @@ data_li_ori = data_li.clone()
 Normalizer_ = Normalizer(data_li)
 torch.save(Normalizer_, 'data/Normalizertest.pth')
 
-
 reNorm = torch.load('data/Normalizertest.pth')
 data_newnormed = reNorm.normalize(data_li)
 data_newunnormed = reNorm.unnormalize(data_newnormed)
