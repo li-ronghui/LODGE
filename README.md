@@ -39,14 +39,14 @@ Our environment is similar to EDGE [official](https://edge-dance.github.io/). Yo
 
 ## 🔢🔢🔢 Data preparation
 
-The [FineDance](https://github.com/li-ronghui/FineDance) dataset lasts an average of 152.3 seconds per dance and has a wealth of 22 dance genres, making it ideal for training dance generation, especially long dance generation. Therefore, we mainly use FineDance to conduct experiments. Please visit [here](https://drive.google.com/file/d/1zQvWG9I0H4U3Zrm8d_QD_ehenZvqfQfS/view) to download the origin FineDance dataset and put it in the ./data floder. Please notice that the origin FineDance motion has 52 joints (including 22 body joints and 30 hand joints), we only use the body part dance to train and test Lodge. Therefore, you need to run the following script to preprocess the dataset.
+The [FineDance](https://github.com/li-ronghui/FineDance) dataset lasts an average of 152.3 seconds per dance and has a wealth of 22 dance genres, making it ideal for training dance generation, especially long dance generation. Therefore, we mainly use FineDance to conduct experiments. Please visit [Google Driver](https://drive.google.com/file/d/1zQvWG9I0H4U3Zrm8d_QD_ehenZvqfQfS/view)[百度云](https://pan.baidu.com/s/1gynUC7pMdpsE31wAwq177w?pwd=o9pw) to download the origin FineDance dataset and put it in the ./data floder. Please notice that the origin FineDance motion has 52 joints (including 22 body joints and 30 hand joints), we only use the body part dance to train and test Lodge. Therefore, you need to run the following script to preprocess the dataset.
 
 ```bash
 python data/code/preprocess.py
 python dld/data/pre/FineDance_normalizer.py
 ```
 
-Otherwise, directly download our preprocessed music and dance features from [here](https://drive.google.com/drive/folders/1cdj8YymfN1BHgggVfGaLjaa9vaEpjPzZ?usp=sharing) and put them into the ./data/finedance folder if you don't wish to process the data.
+Otherwise, directly download our preprocessed music and dance features from [Google Driver](https://drive.google.com/drive/folders/1cdj8YymfN1BHgggVfGaLjaa9vaEpjPzZ?usp=sharing)[百度云](https://pan.baidu.com/s/1i4sTCqCEtxSUR3GspGGfQQ?pwd=ekc0) and put them into the ./data/finedance folder if you don't wish to process the data.
 
 The final file structure is as follows:
 
@@ -84,7 +84,7 @@ Set the pretrained Local Diffusion checkpoint path at the "TRAIN.PRETRAINED" of 
 python train.py --cfg configs/lodge/finedance_fea139_finetune_v2.yaml --cfg_assets configs/data/assets.yaml
 ```
 
-You can also download the pretrained model from [here](https://drive.google.com/file/d/13Yp__EPAw0EjrSS898X5FtSQGmveBykA/view?usp=sharing).
+You can also download the pretrained model from [Google Driver](https://drive.google.com/file/d/13Yp__EPAw0EjrSS898X5FtSQGmveBykA/view?usp=sharing)[百度云](https://pan.baidu.com/s/1twYAdqR5OjSPkIlT1AJafw?pwd=1mte).
 
 ## 🕺🕺🕺 Inference
 Once the training is done, run inference:
