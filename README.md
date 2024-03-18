@@ -113,7 +113,7 @@ python metric/foot_skating.py
 ## 🎼🎼🎼 Citation 
 If you think this project is helpful, please leave a star⭐️⭐️⭐️ and cite our paper:
 ```bibtex
-@inproceedings{li2023lodge,
+@inproceedings{li2024lodge,
   title={Lodge: A Coarse to Fine Diffusion Network for Long Dance Generation Guided by the Characteristic Dance Primitives},
   author={Li, Ronghui and Zhang, Yuxiang and Zhang, Yachao and Zhang, Hongwen and Guo, Jie and Zhang, Yan and Liu, Yebin and Li, Xiu},
   booktitle={IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
