@@ -115,7 +115,7 @@ If you think this project is helpful, please leave a star⭐️⭐️⭐️ and 
 ```bibtex
 @inproceedings{li2023lodge,
   title={Lodge: A Coarse to Fine Diffusion Network for Long Dance Generation Guided by the Characteristic Dance Primitives},
-  author={Ronghui Li, Yuxiang Zhang, Yachao Zhang, Hongwen Zhang, Jie Guo, Yan Zhang, Yebin Liu and Xiu Li},
+  author={Li, Ronghui and Zhang, Yuxiang and Zhang, Yachao and Zhang, Hongwen and Guo, Jie and Zhang, Yan and Liu, Yebin and Li, Xiu},
   booktitle={IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
   year={2024},
 }
