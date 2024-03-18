@@ -90,7 +90,7 @@ You can also download the pretrained model from [Google Driver](https://drive.go
 Once the training is done, run inference:
 The --soft is a float parameter range from 0 to 1, which can set the number of steps for the soft cue guidance action. 
 ```bash
-python infer_lodge.py --cfg configs/lodge/finedance_fea139.yaml --cfg_assets configs/data/assets.yaml --soft 1.0
+python infer_lodge.py --cfg exp/Local_Module/FineDance_FineTuneV2_Local/local_train.yaml --cfg_assets configs/data/assets.yaml --soft 1.0
 ```
 
 ## 🖥️🖥️🖥️ Rendering
