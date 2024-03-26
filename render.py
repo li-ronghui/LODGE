@@ -17,9 +17,7 @@ from pytorch3d.transforms import (axis_angle_to_matrix, matrix_to_axis_angle,
                                   quaternion_to_matrix, rotation_6d_to_matrix)
 
 import sys
-
 import argparse
-
 from typing import NewType
 Tensor = NewType('Tensor', torch.Tensor)
 
@@ -65,7 +63,7 @@ class MovieMaker():
         self.fps = args.fps
         self.img_size = (1200,1200)
 
-        ipadd = "10.103.11.45"# getip()
+        ipadd = "10.103.11.45"
         if ipadd == "10.103.11.45":
             SMPLH_path = "/data/human/datasets/smpl_model/smplh/SMPLH_MALE.pkl"
             SMPL_path = "/data/human/datasets/smpl_model/smpl/SMPL_MALE.pkl"
@@ -96,9 +94,6 @@ class MovieMaker():
         self.scene.add(light, pose=camera_pose)
         self.r = pyrender.OffscreenRenderer(self.img_size[0], self.img_size[1])
         
-        
-        # '/home/data/lrh/floor/NORMAL_new.obj'
-        # /data2/lrh/floor/NORMAL_new.obj
         self.mesh = trimesh.load(trimesh_path)
         floor_mesh  = pyrender.Mesh.from_trimesh(self.mesh)   
         floor_node = self.scene.add(floor_mesh)
