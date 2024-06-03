@@ -126,7 +126,7 @@ METRIC:
   DIST_SYNC_ON_STEP: True  # # Sync Losses on step when distributed trained
   TYPE: ['DanceDiffuse_Metric']  # DanceAE_Metric
 LOGGER:
-  SACE_CHECKPOINT_EPOCH: 50      # 保存间隔
+  SACE_CHECKPOINT_EPOCH: 50     
   LOG_EVERY_STEPS: 50
   VAL_EVERY_STEPS: 50
   TENSORBOARD: true
@@ -158,10 +158,10 @@ DEMO:
   use_cached_features: false
 
 FINEDANCE:
-  mix: False           # 是否做混合的数据增强
-  full_seq_len: 256   # 150
+  mix: False           # weather do mix data augmentation
+  full_seq_len: 1024  
   windows: 8  # 16   #40   #
-  is_mirror: False    # 是否做镜像的数据增强
+  is_mirror: False    # weather do mix data augmentation
   nfeats: 139
   njoints: 22   
   mode: single  # "single" , "double_react", "double"
