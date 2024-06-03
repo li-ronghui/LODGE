@@ -146,11 +146,11 @@ DEMO:
   use_cached_features: false
 
 FINEDANCE:
-  mix: False           # 是否做混合的数据增强
-  full_seq_len: 256   # 150
+  mix: False           
+  full_seq_len: 1024   # 150
   length_fi: 128
   windows: 10  # 16   #40   #
-  is_mirror: False    # 是否做镜像的数据增强
+  is_mirror: False    
   nfeats: 139
   njoints: 22   
   mode: single  # "single" , "double_react", "double"
