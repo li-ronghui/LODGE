@@ -157,9 +157,9 @@ def motion_feats_extract(moinputs_dir, mooutputs_dir, music_indir, music_outdir)
 
 
 if __name__ == "__main__":
-    motion_feats_extract(moinputs_dir='/data2/lrh/dataset/fine_dance/origin/motion_feature315', 
-                        # moinputs_dir='data/finedance/motion/', 
+    motion_feats_extract(#moinputs_dir='/data2/lrh/dataset/fine_dance/origin/motion_feature315', 
+                        moinputs_dir='data/finedance/motion/', 
                         mooutputs_dir="data/finedance/mofea319/", 
-                        #  music_indir="data/finedance/music_npy", 
-                        music_indir="/data2/lrh/dataset/fine_dance/origin/music_feature35_edge",
+                        music_indir="data/finedance/music_npy", 
+                        # music_indir="/data2/lrh/dataset/fine_dance/origin/music_feature35_edge",
                         music_outdir="data/finedance/music_npynew/", )
