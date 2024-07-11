@@ -76,15 +76,15 @@ class MovieMaker():
         else:
             raise("error of machine ip")
 
-
-        self.smplh = SMPLH(SMPLH_path, use_pca=False, flat_hand_mean=True)
-        self.smplh.to(f'cuda:{args.device}').eval()
-        
-        self.smpl = SMPL(SMPL_path)
-        self.smpl.to(f'cuda:{args.device}').eval()
-
-        self.smplx = SMPLX(SMPLX_path, use_pca=False, flat_hand_mean=True).eval()
-        self.smplx.to(f'cuda:{args.device}').eval()
+        if args.mode == 'smplh':
+            self.smplh = SMPLH(SMPLH_path, use_pca=False, flat_hand_mean=True)
+            self.smplh.to(f'cuda:{args.device}').eval()
+        if args.mode == 'smpl':
+            self.smpl = SMPL(SMPL_path)
+            self.smpl.to(f'cuda:{args.device}').eval()
+        if args.mode == 'smplx':
+            self.smplx = SMPLX(SMPLX_path, use_pca=False, flat_hand_mean=True).eval()
+            self.smplx.to(f'cuda:{args.device}').eval()
 
         self.scene = pyrender.Scene()
         camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
