@@ -277,7 +277,7 @@ class Global_Module(BaseModel):
         epoch = int(self.trainer.current_epoch)
         batch = self.get_input(batch, batch_idx)
         loss = self.allsplit_step("train", batch, batch_idx, epoch)
-        self.training_step_outputs.append(loss)
+        # self.training_step_outputs.append(loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
