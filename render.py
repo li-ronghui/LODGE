@@ -63,18 +63,11 @@ class MovieMaker():
         self.fps = args.fps
         self.img_size = (1200,1200)
 
-        ipadd = "10.103.11.45"
-        if ipadd == "10.103.11.45":
-            SMPLH_path = "/data/human/datasets/smpl_model/smplh/SMPLH_MALE.pkl"
-            SMPL_path = "/data/human/datasets/smpl_model/smpl/SMPL_MALE.pkl"
-            SMPLX_path = "/data/human/datasets/smpl_model/smplx/SMPLX_NEUTRAL.npz"
-            trimesh_path = '/data2/lrh/floor/NORMAL_new.obj'
-        elif ipadd == "10.103.11.40":
-            SMPLH_path = "/data/lrh/smpl_model/smplh/SMPLH_MALE.pkl"
-            SMPL_path =  "/data/lrh/smpl_model/smpl/SMPL_MALE.pkl"
-            trimesh_path = '/data/lrh/floor/NORMAL_new.obj'
-        else:
-            raise("error of machine ip")
+    
+        SMPLH_path = "/data/human/datasets/smpl_model/smplh/SMPLH_MALE.pkl"
+        SMPL_path = "/data/human/datasets/smpl_model/smpl/SMPL_MALE.pkl"
+        SMPLX_path = "/data/human/datasets/smpl_model/smplx/SMPLX_NEUTRAL.npz"
+        trimesh_path = '/data2/lrh/floor/NORMAL_new.obj'
 
         if args.mode == 'smplh':
             self.smplh = SMPLH(SMPLH_path, use_pca=False, flat_hand_mean=True)
