@@ -112,15 +112,16 @@ python metric/foot_skating.py
 If you think this project is helpful, please leave a star⭐️⭐️⭐️ and cite our paper:
 ```bibtex
 @inproceedings{li2024lodge,
-  title={Lodge: A Coarse to Fine Diffusion Network for Long Dance Generation Guided by the Characteristic Dance Primitives},
-  author={Li, Ronghui and Zhang, Yuxiang and Zhang, Yachao and Zhang, Hongwen and Guo, Jie and Zhang, Yan and Liu, Yebin and Li, Xiu},
-  booktitle={IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
-  year={2024},
+  title={Lodge: A coarse to fine diffusion network for long dance generation guided by the characteristic dance primitives},
+  author={Li, Ronghui and Zhang, YuXiang and Zhang, Yachao and Zhang, Hongwen and Guo, Jie and Zhang, Yan and Liu, Yebin and Li, Xiu},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={1524--1534},
+  year={2024}
 }
 @inproceedings{li2023finedance,
-  title={FineDance: A Fine-grained Choreography Dataset for 3D Full Body Dance Generation},
+  title={Finedance: A fine-grained choreography dataset for 3d full body dance generation},
   author={Li, Ronghui and Zhao, Junfan and Zhang, Yachao and Su, Mingyang and Ren, Zeping and Zhang, Han and Tang, Yansong and Li, Xiu},
-  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
   pages={10234--10243},
   year={2023}
 }
