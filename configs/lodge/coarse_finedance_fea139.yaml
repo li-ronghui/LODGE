@@ -148,7 +148,7 @@ DEMO:
 FINEDANCE:
   mix: False           
   full_seq_len: 1024   # 150
-  length_fi: 128
+  length_fi: 256
   windows: 10  # 16   #40   #
   is_mirror: False    
   nfeats: 139
